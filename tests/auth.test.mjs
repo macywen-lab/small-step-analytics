@@ -1,0 +1,21 @@
+import test from'node:test';import assert from'node:assert/strict';import{LocalBucket}from'../scripts/local-bucket.mjs';import worker from'../dist/server/index.js';
+const call=(bucket,path,method='GET',body,cookie)=>worker.fetch(new Request('https://localhost/api/admin/'+path,{method,headers:{...(method==='GET'?{}:{'content-type':'application/json','x-small-step-write':'1'}),...(cookie?{cookie}:{})},...(body?{body:JSON.stringify(body)}:{})}),{BUCKET:bucket});
+async function login(bucket,id='2163',password='2163'){const r=await call(bucket,'auth/login','POST',{id,password});assert.equal(r.status,200);assert.match(r.headers.get('set-cookie'),/HttpOnly; SameSite=Strict.*Secure/);return r.headers.get('set-cookie').split(';')[0]}
+ test('admin endpoints require server session; bootstrap stores hash only; logout revokes cookie',async()=>{const bucket=new LocalBucket;assert.equal((await call(bucket,'status')).status,401);const cookie=await login(bucket),users=await(await bucket.get('small-step/auth/v1/users.json')).json();assert.equal(users.users[0].password,undefined);assert.equal(users.users[0].hash.length,64);assert.notEqual(users.users[0].hash,'2163');assert.equal((await call(bucket,'status','GET',null,cookie)).status,200);assert.equal((await call(bucket,'auth/logout','POST',{},cookie)).status,200);assert.equal((await call(bucket,'status','GET',null,cookie)).status,401)});
+ test('admin creates/deletes personnel and uploader cannot manage accounts',async()=>{const b=new LocalBucket,c=await login(b);assert.equal((await call(b,'auth/users','POST',{id:'3000',password:'testpass',role:'uploader'},c)).status,201);const other=await login(b,'3000','testpass');assert.equal((await call(b,'status','GET',null,other)).status,200);assert.equal((await call(b,'auth/users','GET',null,other)).status,403);assert.equal((await call(b,'auth/users','DELETE',{id:'2163'},c)).status,422);assert.equal((await call(b,'auth/users','DELETE',{id:'3000'},c)).status,200);assert.equal((await call(b,'status','GET',null,other)).status,401)});
+ test('password change invalidates every existing session and requires new password',async()=>{const b=new LocalBucket,c1=await login(b),c2=await login(b);assert.equal((await call(b,'auth/password','POST',{currentPassword:'wrong',newPassword:'newpassword'},c1)).status,422);assert.equal((await call(b,'auth/password','POST',{currentPassword:'2163',newPassword:'newpassword'},c1)).status,200);assert.equal((await call(b,'status','GET',null,c1)).status,401);assert.equal((await call(b,'status','GET',null,c2)).status,401);assert.equal((await call(b,'auth/login','POST',{id:'2163',password:'2163'})).status,401);assert.equal((await call(b,'status','GET',null,await login(b,'2163','newpassword'))).status,200)});
+ test('repeated failed login is throttled',async()=>{const b=new LocalBucket;for(let i=0;i<5;i++)assert.equal((await call(b,'auth/login','POST',{id:'2163',password:'wrong'})).status,401);assert.equal((await call(b,'auth/login','POST',{id:'2163',password:'2163'})).status,429)});
+ test('file downloads and uploads require a live backend session and employee viewing requires its own login',async()=>{
+ const bucket=new LocalBucket;
+ const request=(path,cookie,method='GET')=>worker.fetch(new Request('https://localhost'+path,{method,headers:cookie?{cookie}:{}}),{BUCKET:bucket});
+ const files=['/upload-template.xlsx','/data.json','/stories.json','/roster.json','/electronic-notes.json','/api/admin/backup','/api/admin/original?revision=initial'];
+ for(const path of files){assert.equal((await request(path)).status,401,path);assert.equal((await request(path,'small_step_session=invalid')).status,401,path)}
+ assert.equal((await request('/upload-template.xlsx',null,'HEAD')).status,401);
+ assert.equal((await request('/api/admin/update',null,'POST')).status,401);
+ assert.equal((await request('/api/dataset')).status,401);
+ const cookie=await login(bucket),template=await request('/upload-template.xlsx',cookie);
+ assert.equal(template.status,200);assert.match(template.headers.get('cache-control'),/no-store/);
+ assert.equal((await request('/api/admin/backup',cookie)).status,200);
+ await call(bucket,'auth/logout','POST',{},cookie);
+ for(const path of files)assert.equal((await request(path,cookie)).status,401,path);
+ });

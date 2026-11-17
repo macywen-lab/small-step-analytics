@@ -1,0 +1,18 @@
+import * as THREE from './vendor/three.module.min.js';
+const theater=document.querySelector('#highlightTheater'),webglCanvas=document.querySelector('#warmthWebGL'),canvas=document.querySelector('#warmthCanvas'),context=canvas.getContext('2d'),reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+let width=1,height=1,frame=0,lastTime=0,renderer=null,scene=null,camera=null,points=null;
+const motes=Array.from({length:30},(_,i)=>({x:((i*73+19)%997)/997,y:((i*137+59)%991)/991,r:.6+(i%4)*.35,speed:.007+(i%5)*.002}));
+try{
+ renderer=new THREE.WebGLRenderer({canvas:webglCanvas,alpha:true,antialias:false,powerPreference:'low-power'});renderer.setClearColor(0x000000,0);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(45,1,.1,50);camera.position.z=10;
+ const geometry=new THREE.BufferGeometry(),positions=new Float32Array(180*3),colors=new Float32Array(180*3);
+ for(let i=0;i<180;i++){const a=i*2.39996323,r=1.2+Math.sqrt(i/180)*5;positions[i*3]=Math.cos(a)*r;positions[i*3+1]=Math.sin(a)*r*.65;positions[i*3+2]=Math.sin(i*.7)*1.7;const c=new THREE.Color(i%3?0xddc58b:0x91b38c);colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b}
+ geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));points=new THREE.Points(geometry,new THREE.PointsMaterial({size:.035,vertexColors:true,transparent:true,opacity:.65,depthWrite:false,blending:THREE.AdditiveBlending}));scene.add(points);theater.dataset.atmosphere='webgl-and-canvas';
+}catch{webglCanvas.style.display='none';theater.dataset.atmosphere='canvas'}
+function resize(){const r=theater.getBoundingClientRect();if(!r.width||!r.height)return;width=r.width;height=r.height;const ratio=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);context?.setTransform(ratio,0,0,ratio,0,0);if(renderer){renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix()}if(reduced.matches)draw(0)}
+function draw(time){if(context){context.clearRect(0,0,width,height);const glow=context.createRadialGradient(width*.83,height*.09,0,width*.83,height*.09,width*.57);glow.addColorStop(0,'rgba(212,184,112,.13)');glow.addColorStop(1,'rgba(212,184,112,0)');context.fillStyle=glow;context.fillRect(0,0,width,height);for(const p of motes){const x=p.x*width+Math.sin(time*.09+p.y*6)*12,y=((p.y-time*p.speed*.08)%1+1)%1*height;context.beginPath();context.arc(x,y,p.r,0,Math.PI*2);context.fillStyle='rgba(224,202,144,.4)';context.fill()}}if(renderer&&points){points.rotation.z=time*.008;points.rotation.y=Math.sin(time*.035)*.12;renderer.render(scene,camera)}}
+function tick(now){if(document.hidden||!document.body.classList.contains('electronic-view')||reduced.matches){frame=0;return}if(now-lastTime>45){draw(now/1000);lastTime=now}frame=requestAnimationFrame(tick)}
+function resume(){resize();if(!frame&&!document.hidden&&document.body.classList.contains('electronic-view')&&!reduced.matches)frame=requestAnimationFrame(tick)}
+function pause(){cancelAnimationFrame(frame);frame=0}
+new ResizeObserver(resize).observe(theater);window.addEventListener('warmth:resume',resume);window.addEventListener('warmth:pause',pause);window.addEventListener('warmth:resize',resize);document.addEventListener('visibilitychange',()=>document.hidden?pause():resume());reduced.addEventListener('change',()=>{pause();resume()});
+webglCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();renderer=null;webglCanvas.style.display='none';theater.dataset.atmosphere='canvas'});
+resize();resume();

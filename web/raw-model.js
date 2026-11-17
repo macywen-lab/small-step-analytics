@@ -1,0 +1,90 @@
+import {normalizedQuarter,normalizedStories,quarterSummary,countValue,textValue,fail} from './import-model.js';
+
+export const HISTORICAL_NAME_ALIASES={'匿名員工041':'匿名員工04','匿名員工05X':'匿名員工05'};
+export const HISTORICAL_DEPARTMENT_OVERRIDES={'匿名員工01':'環安部','匿名員工02':'一廠','匿名員工05':'二廠'};
+export function employmentDate(value,label,required=false){
+ const v=String(value??'').trim();if(!v){if(required)fail(`${label}不得留白。`);return ''}
+ const match=v.match(/^(\d{4})[/.\-](\d{1,2})[/.\-](\d{1,2})$/);if(!match)fail(`${label}請填 YYYY/MM/DD 日期。`);
+ const [y,m,d]=match.slice(1).map(Number),date=new Date(Date.UTC(y,m-1,d));if(y<1900||y>2200||date.getUTCFullYear()!==y||date.getUTCMonth()!==m-1||date.getUTCDate()!==d)fail(`${label}不是有效日期。`);
+ return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+}
+export function departmentAt(employee,cutoff){return employee.departmentBefore&&cutoff<employee.departmentBefore.date?employee.departmentBefore.department:employee.department}
+export function activeAt(employee,cutoff){const start=employee.hireDate||employee.knownActiveBy;return !!start&&start<=cutoff&&(!employee.leaveDate||employee.leaveDate>cutoff)}
+export function employmentStatus(employee,today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'})){const start=employee.hireDate||employee.knownActiveBy;return !start?employee.status||'未註記':start>today?'未到職':employee.leaveDate&&employee.leaveDate<=today?'離職':'在職'}
+export function periodHeadcounts(roster,year){
+ if(!roster.some(e=>e.hireDate||e.knownActiveBy))return null;
+ const periods={};for(let month=1;month<=12;month++){
+  const cutoff=new Date(Date.UTC(year,month,0)).toISOString().slice(0,10),departments={};
+  for(const e of roster){const department=departmentAt(e,cutoff),r=departments[department]||={count:0,unknown:0};if(!e.hireDate&&(!e.knownActiveBy||e.knownActiveBy>cutoff))r.unknown++;else if(activeAt(e,cutoff))r.count++}
+  let total=0,unknown=0;for(const r of Object.values(departments)){total+=r.count;unknown+=r.unknown;if(r.unknown)r.count=null}
+  periods[month]={cutoff,departments,total:unknown?null:total,unknown};if(month%3===0)periods['q'+month/3]=periods[month];
+ }periods.all=periods[12];return periods
+}
+export function publicQuarterData(snapshot){return snapshot.data.map(q=>{
+ const headcounts=periodHeadcounts(snapshot.roster||[],Number(q.year||2026));if(!headcounts)return q;
+ const reported=[];for(const period of [...q.months,q.id]){const h=headcounts[period],departments=[...new Set([...q.people.map(p=>p.department),...Object.keys(h.departments)])];
+ const rows=departments.map(department=>{const mm=q.people.filter(p=>p.department===department).flatMap(p=>p.months).filter(m=>period===q.id||m.month===period),paper=mm.reduce((s,m)=>s+m.paper,0),digital=mm.reduce((s,m)=>s+m.digital,0),headcount=h.departments[department]?.count??null;return {period,department,paper,digital,total:paper+digital,headcount,average:headcount?(paper+digital)/headcount:null,rank:null}}).sort((a,b)=>(b.average??-1)-(a.average??-1)||a.department.localeCompare(b.department,'zh-Hant'));
+ let rank=0,last=null;rows.forEach((r,i)=>{if(r.average!==null){if(r.average!==last){rank=i+1;last=r.average}r.rank=rank}});reported.push(...rows)
+ }return {...q,headcounts,reported}
+})}
+
+export function normalizeRoster(rows){
+ if(!Array.isArray(rows)||rows.length>10000)fail('員工名單格式不正確，最多支援 10,000 位。');const names=new Set();return rows.map(r=>{
+ const name=textValue(r.name,'員工姓名',150);if(names.has(name))fail(`員工名單中「${name}」重複，請保留一列。`);names.add(name);const status=r.status||'未註記';if(!['未註記','在職','離職','未到職'].includes(status))fail(`${name}的在離職狀態不正確。`);
+ const next={name,department:textValue(r.department,'員工部門',100),group:textValue(r.group||'','員工組別',100,true),status};
+ if(r.hireDate!==undefined||r.knownActiveBy){next.hireDate=employmentDate(r.hireDate,`${name}到職日`,!r.knownActiveBy);next.leaveDate=employmentDate(r.leaveDate,`${name}離職日`);if(r.knownActiveBy)next.knownActiveBy=employmentDate(r.knownActiveBy,`${name}已在職確認日`,true);const start=next.hireDate||next.knownActiveBy;if(next.leaveDate&&next.leaveDate<start)fail(`${name}離職日不得早於到職日／已在職確認日。`)}
+ if(r.departmentBefore)next.departmentBefore={date:employmentDate(r.departmentBefore.date,`${name}部門異動日`,true),department:textValue(r.departmentBefore.department,'原部門',100)};
+ return next
+ })
+}
+export function rosterFromData(data,seed=[]){const map=new Map(seed.map(r=>[r.name,{...r}]));for(const q of data)for(const p of q.people){const old=map.get(p.name);map.set(p.name,{...old,name:p.name,department:old?.department||p.department,group:old?.group||'',status:old?.status||'未註記'})}return normalizeRoster([...map.values()])}
+export function normalizedRaw(raw){
+ if(!raw||!Array.isArray(raw.records)||raw.records.length>50000||!Array.isArray(raw.employees)||raw.employees.length>5000)fail('原始資料格式不正確或超過支援筆數。');
+ const employees=raw.employees.map(r=>{const name=textValue(r.name,'員工姓名',150),base={name,department:textValue(r.department||'','員工部門',100,true),group:textValue(r.group||'','員工組別',100,true)};
+ if(r.hireDate!==undefined||r.knownActiveBy){const dated=normalizeRoster([{...base,hireDate:r.hireDate,leaveDate:r.leaveDate,knownActiveBy:r.knownActiveBy,departmentBefore:r.departmentBefore,status:'未註記'}])[0];return {...dated,status:employmentStatus(dated)}}
+ const status=textValue(r.status||'','新進離職',20,true);if(!['','新進','到職','在職','復職','離職'].includes(status))fail(`${name}的「新進離職」格式不正確。`);return {...base,status}});
+ const names=new Set;for(const e of employees){if(names.has(e.name))fail(`員工名單中「${e.name}」重複，請保留一列。`);names.add(e.name)}
+ const rows=new Set;const records=raw.records.map(sourceRow=>{let r={...sourceRow};if(r.month<=6){r.name=HISTORICAL_NAME_ALIASES[r.name]||r.name;r.sender=HISTORICAL_NAME_ALIASES[r.sender]||r.sender;if(HISTORICAL_DEPARTMENT_OVERRIDES[r.name])r.department=HISTORICAL_DEPARTMENT_OVERRIDES[r.name]} if(!['digital','paper'].includes(r.source))fail('便利貼來源不正確。');const row=countValue(r.row,'便利貼列次');if(row<2)fail('便利貼列次不正確。');const key=r.source+'/'+row;if(rows.has(key))fail('來源列次重複。');rows.add(key);const month=countValue(r.month,'月份');if(month<1||month>12)fail('目前網站管理 2026 年 1～12 月，請調整區間／週期。');if(r.source==='digital'&&month<=2)fail('2026 年 1～2 月尚未啟用電子票，不可匯入電子紀錄。');return {source:r.source,row,month,name:textValue(r.name,'幫忙的人／姓名',150),department:textValue(r.department||'','便利貼部門',100,true),group:textValue(r.group||'','便利貼組別',100,true),sender:textValue(r.sender||'','填表人／署名',150,true),beneficiary:textValue(r.beneficiary||'','被幫忙的人',250,true),content:textValue(r.content||'','事件說明／內容',20000,true),date:textValue(r.date||'','填表日期',40,true),period:textValue(r.period||r.month+'月','區間',100,true),bonus:countValue(r.bonus,'加分／加成')}});
+ return {employees,records,rosterOnly:raw.rosterOnly===true}
+}
+export function mergeEmployees(current,delta){const map=new Map(normalizeRoster(current).map(e=>[e.name,{...e}])),changes=[];
+ for(const e of delta){const old=map.get(e.name);if(!old&&e.status==='離職'&&e.hireDate===undefined&&!e.knownActiveBy)fail(`「${e.name}」尚未存在於保留名冊，無法直接標記離職，請先核對姓名。`);if(!old&&!e.department)fail(`新員工「${e.name}」必須填寫部門。`);const dated=e.hireDate!==undefined||!!e.knownActiveBy,status=dated?employmentStatus(e):e.status==='離職'?'離職':e.status?'在職':old?.status||'在職';const next={...old,name:e.name,department:e.department||old?.department,group:e.group||old?.group||'',status,...(dated?{hireDate:e.hireDate||'',leaveDate:e.leaveDate,...(e.knownActiveBy?{knownActiveBy:e.knownActiveBy}:{}),...(e.departmentBefore?{departmentBefore:e.departmentBefore}:{})}:{})};map.set(e.name,next);if(!old)changes.push({name:e.name,type:'新增',before:null,after:next});else if(JSON.stringify(old)!==JSON.stringify(next))changes.push({name:e.name,type:status==='離職'&&old.status!=='離職'?'離職':old.status==='離職'&&status==='在職'?'復職':'資料更新',before:old,after:next});}
+ return {roster:normalizeRoster([...map.values()]),changes}
+}
+function emptyMonth(month){return {month,paperBase:0,paperBonus:0,paper:0,digitalBase:0,digitalBonus:0,digital:0,paperSignature:0,digitalSignature:0}}
+function emptyPerson(e,row,months){return {name:e.name,department:e.department,row,months:months.map(emptyMonth),paperSignature:0,digitalSignature:0,signature:0}}
+export function applyRawImport(snapshot,input){
+ const raw=normalizedRaw(input.raw),filename=textValue(input.filename,'檔名',240);const year=filename.match(/20\d{2}/)?.[0];if(year&&year!=='2026')fail('此網站目前管理 2026 年資料，請勿上傳其他年度。');if(!Array.isArray(input.months)||input.months.length>12)fail('請選擇本次要更新的月份。');const selected=[...new Set(input.months)].sort((a,b)=>a-b);for(const m of selected)if(!Number.isInteger(m)||m<1||m>12)fail('更新月份必須介於 1～12 月。');if(raw.rosterOnly&&selected.length)fail('只含員工名單的檔案不可替換月份票數。');if(!selected.length&&!raw.employees.length)fail('請選擇更新月份，或在員工名單提供異動資料。');
+ const merged=mergeEmployees(snapshot.roster||rosterFromData(snapshot.data),raw.employees),roster=merged.roster,employees=new Map(roster.map(e=>[e.name,e])),warnings=[],records=raw.records.filter(r=>selected.includes(r.month)),byQuarter=new Map;
+ const outside=raw.records.length-records.length;if(outside)warnings.push(`檔案中 ${outside} 筆便利貼不屬於勾選月份，本次不套用。`);
+ const unknown=[...new Set(records.filter(r=>!employees.has(r.name)).map(r=>r.name))];if(unknown.length)fail(`以下幫忙的人未在保留名冊，請先在「員工名單」補上：${unknown.slice(0,12).join('、')}。`);
+ const mismatch=records.find(r=>r.source==='digital'&&r.department&&r.department!==departmentAt(employees.get(r.name),new Date(Date.UTC(2026,r.month,0)).toISOString().slice(0,10)));if(mismatch)fail(`${mismatch.name}的電子便利貼部門「${mismatch.department}」與該期部門「${departmentAt(employees.get(mismatch.name),new Date(Date.UTC(2026,mismatch.month,0)).toISOString().slice(0,10))}」不一致，請先核對員工名單。`);
+ const data=structuredClone(snapshot.data);for(const id of [...new Set(selected.map(m=>'q'+Math.ceil(m/3)))])if(!data.some(q=>q.id===id)){const months=Array.from({length:3},(_,i)=>(Number(id.slice(1))-1)*3+i+1),cutoff=new Date(Date.UTC(2026,months[2],0)).toISOString().slice(0,10),people=roster.filter(e=>activeAt(e,cutoff)).map((e,i)=>emptyPerson({...e,department:departmentAt(e,cutoff)},i+2,months)),managers=[...new Set(snapshot.data.flatMap(q=>q.managers.map(m=>m.name)))].map(name=>({name,paper:0,digital:0,total:0}));data.push({id,months,filename,people,managers,reported:[],unattributedSignature:0,calculationMode:'raw',coveredMonths:[]})}data.sort((a,b)=>a.id.localeCompare(b.id));const stories=(snapshot.stories||[]).filter(s=>!selected.includes(s.month));
+ const notes=(snapshot.notes||[]).filter(n=>!selected.includes(n.month));for(const r of records.filter(r=>r.source==='digital'))notes.push({id:`${'q'+Math.ceil(r.month/3)}-${r.month}-e-${r.row}`,quarter:'q'+Math.ceil(r.month/3),month:r.month,name:r.name,department:departmentAt(employees.get(r.name),new Date(Date.UTC(2026,r.month,0)).toISOString().slice(0,10)),date:r.date,sender:r.sender,beneficiary:r.beneficiary,content:r.content,bonus:r.bonus,period:r.period});notes.sort((a,b)=>a.month-b.month||a.id.localeCompare(b.id));
+ // Roster-only new hires appear as zero-vote people in the latest quarter, never in older quarters.
+ if(!selected.length&&data.length){const latest=data[data.length-1];let row=Math.max(1,...latest.people.map(p=>p.row));for(const change of merged.changes.filter(c=>c.type==='新增'))if(!latest.people.some(p=>p.name===change.name))latest.people.push(emptyPerson(change.after,++row,latest.months))}
+ for(const old of data){const covered=old.months.filter(m=>selected.includes(m));if(!covered.length)continue;const complete=covered.length===3,people=new Map(old.people.map(p=>[p.name,p]));
+  if(!complete&&old.people.some(p=>p.months.some(m=>m.paperSignature===undefined||m.digitalSignature===undefined)))fail(`${old.months[0]}～${old.months[2]} 月舊版署名尚無月份明細，第一次改用原始資料時，請一次上傳並勾選整季三個月。`);
+  // Keep the historical quarter cohort; add genuinely new staff and record participants.
+  const needed=new Set([...raw.employees.filter(e=>['新進','到職','復職'].includes(e.status)||!snapshot.roster?.some(x=>x.name===e.name)).map(e=>e.name),...records.filter(r=>old.months.includes(r.month)).flatMap(r=>[r.name,...(employees.has(r.sender)?[r.sender]:[])])]);
+  let nextRow=Math.max(1,...old.people.map(p=>p.row));for(const name of needed)if(!people.has(name)){const p=emptyPerson({...employees.get(name),department:departmentAt(employees.get(name),new Date(Date.UTC(2026,old.months[2],0)).toISOString().slice(0,10))},++nextRow,old.months);people.set(name,p);old.people.push(p)}
+  for(const p of old.people)for(let i=0;i<p.months.length;i++)if(covered.includes(p.months[i].month))p.months[i]=emptyMonth(p.months[i].month);
+  let blankContent=0,unknownSenders=0,departedRecords=0;const sameRows=new Map;for(const r of records.filter(r=>old.months.includes(r.month))){const p=people.get(r.name),m=p.months.find(x=>x.month===r.month),source=r.source;m[source+'Base']++;m[source+'Bonus']+=r.bonus;m[source]=m[source+'Base']+m[source+'Bonus'];if(employees.get(r.name).status==='離職')departedRecords++;
+   if(r.sender&&people.has(r.sender))people.get(r.sender).months.find(x=>x.month===r.month)[source+'Signature']++;else if(r.sender)unknownSenders++;
+   const signature=JSON.stringify([r.source,r.month,r.name,r.sender,r.date,r.content,r.bonus]);sameRows.set(signature,(sameRows.get(signature)||0)+1);
+   if(r.bonus&&r.content){stories.push({id:`${old.id}-${r.month}-${source==='paper'?'p':'e'}-${r.row}`,quarter:old.id,source,sheet:source==='paper'?'紙本便利貼':'電子便利貼(全)',row:r.row,name:r.name,department:p.department,month:r.month,bonus:r.bonus,content:r.content,sender:r.sender,beneficiary:r.beneficiary,date:r.date})}else if(r.bonus)blankContent++;
+  }
+  if(blankContent)warnings.push(`${blankContent} 筆有加分但沒有內容，票數照計，未列入暖心精選。`);if(unknownSenders)warnings.push(`${unknownSenders} 筆填表人／署名不在名冊，便利貼票數照計，未歸入具名署名。`);if(departedRecords)warnings.push(`${departedRecords} 筆紀錄的受肯定者已標記離職，仍保留在歷史票數中。`);const duplicates=[...sameRows.values()].reduce((s,n)=>s+Math.max(0,n-1),0);if(duplicates)warnings.push(`${duplicates} 筆紀錄的主要欄位完全相同；每列仍各算一張便利貼，請確認沒有重複貼入。`);
+  for(const p of old.people){p.paperSignature=p.months.reduce((s,m)=>s+m.paperSignature,0);p.digitalSignature=p.months.reduce((s,m)=>s+m.digitalSignature,0);p.signature=p.paperSignature+p.digitalSignature}
+  old.managers=old.managers.map(manager=>{const p=people.get(manager.name);return {name:manager.name,paper:p?.paperSignature||0,digital:p?.digitalSignature||0,total:p?.signature||0}});
+  old.filename=filename;old.calculationMode='raw';old.coveredMonths=[...new Set([...(old.coveredMonths||[]),...covered])].sort((a,b)=>a-b);old.reported=[];for(const period of [...old.months,old.id]){const sums=[...new Set(old.people.map(p=>p.department))].map(department=>{const ps=old.people.filter(p=>p.department===department),mm=ps.flatMap(p=>p.months).filter(m=>period===old.id||m.month===period),paper=mm.reduce((s,m)=>s+m.paper,0),digital=mm.reduce((s,m)=>s+m.digital,0);return {department,paper,digital,total:paper+digital,headcount:ps.length,average:ps.length?(paper+digital)/ps.length:0,rank:0,period}}).sort((a,b)=>b.average-a.average||a.department.localeCompare(b.department,'zh-Hant'));let rank=0,last=null;sums.forEach((r,i)=>{if(r.average!==last){rank=i+1;last=r.average}r.rank=rank});old.reported.push(...sums)}
+  // The original unnamed-signature total is a legacy note; it cannot be split by month.
+  if(complete)old.unattributedSignature=unknownSenders;byQuarter.set(old.id,covered);
+ }
+ const normalizedData=data.map(normalizedQuarter),normalizedAllStories=normalizedData.flatMap(q=>normalizedStories(stories.filter(s=>s.quarter===q.id),q)).sort((a,b)=>a.month-b.month||a.source.localeCompare(b.source)||a.row-b.row);
+ for(const q of normalizedData){const previous=snapshot.data.find(x=>x.id===q.id);for(const month of byQuarter.get(q.id)||[]){const before=previous?quarterSummary(previous).monthly.find(m=>m.month===month):{total:0,paper:0,digital:0},after=quarterSummary(q).monthly.find(m=>m.month===month);if(before.total>0&&after.total===0)warnings.push(`${month} 月將由 ${before.total} 票改為 0 票，請確認本月兩種來源都已完整上傳。`);else for(const source of ['paper','digital'])if(before[source]>0&&after[source]===0)warnings.push(`${month} 月${source==='paper'?'紙本':'電子'}票數將由 ${before[source]} 改為 0，請確認沒有漏傳此來源。`)}}
+ const unknownDates=roster.filter(e=>!e.hireDate&&!e.knownActiveBy).length;if(roster.some(e=>e.hireDate||e.knownActiveBy)&&unknownDates)warnings.push(`${unknownDates} 位保留員工尚缺到職日；相關部門月底／季末人數及平均分暫不計算，請補齊日期。`);const changes=merged.changes;if(changes.some(c=>c.type==='離職'))warnings.push('離職日當天已不在職；離職人員的歷史便利貼與票數仍保留。');if(changes.some(c=>c.before&&c.before.department!==c.after.department))warnings.push('員工部門已更新；既有季度歸屬保留，避免更動歷史統計。');
+ return {snapshot:{data:normalizedData,stories:normalizedAllStories,roster,notes},summary:normalizedData.map(q=>quarterSummary(q,normalizedAllStories)),months:selected,recordCount:records.length,changes,warnings,rosterSummary:{total:roster.length,departed:roster.filter(e=>e.status==='離職').length,added:changes.filter(c=>c.type==='新增').length,changed:changes.length},filename};
+}
+
+export function normalizedElectronicNotes(rows,q){if(!Array.isArray(rows)||rows.length>60000)fail('電子便條紙格式不正確或超過 60,000 筆。');const ids=new Set,people=new Map(q.people.map(p=>[p.name,p]));return rows.map(n=>{const id=textValue(n.id,'電子便條紙識別碼',200),name=textValue(n.name,'電子便條紙姓名',150),department=textValue(n.department,'電子便條紙部門',100);if(ids.has(id)||n.quarter!==q.id||!q.months.includes(n.month)||!people.has(name)||people.get(name).department!==department)fail('電子便條紙與季度名冊不一致，請核對來源檔案。');ids.add(id);return {id,quarter:q.id,month:n.month,name,department,date:textValue(n.date||'','電子便條紙日期',40,true),sender:textValue(n.sender||'','電子便條紙填表人',150,true),beneficiary:textValue(n.beneficiary||'','被幫忙的人',250,true),content:textValue(n.content||'','電子便條紙內容',20000,true)}})}
