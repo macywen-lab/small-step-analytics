@@ -1,0 +1,244 @@
+/* Larger, higher-contrast type for daily desktop and mobile review. */
+:root{--muted:#627361}
+body{font-size:17px;line-height:1.65}
+.sidebar{width:272px;padding:32px 25px;overflow-y:auto}
+main{margin-left:272px}
+.brand{font-size:26px;gap:12px}
+.brand small{font-size:12px;letter-spacing:.2px;line-height:1.6}
+.brand-icon{flex-shrink:0}
+.workspace-label{font-size:19px;font-weight:700;line-height:1.75;letter-spacing:.5px;color:#45623d;margin-top:35px;margin-bottom:20px}
+.workspace-label span{display:block}
+nav button{font-size:18px;padding:15px 17px}
+nav button span{font-size:22px;width:30px}
+.side-note{margin-top:35px;padding:20px 16px}
+.side-note h3{font-size:19px;line-height:1.8}
+.side-note p{font-size:14px;line-height:1.9;color:#65775d}
+.side-bottom{font-size:14px;color:#5f7558;padding-top:25px}
+.side-bottom small{font-size:12px;color:#708365;line-height:1.8}
+.topbar{font-size:15px;height:80px;color:#6c7d65}
+.snapshot-tag{font-size:14px;padding:7px 12px}
+.icon-btn{width:40px;height:40px;font-size:25px}
+.content{padding-top:35px}
+.eyebrow{font-size:12px;color:#6c825f;line-height:1.8}
+.page-heading h1{font-size:34px;line-height:1.65}
+.page-heading p:not(.eyebrow){font-size:17px;line-height:1.85}
+.export{font-size:16px;padding:12px 16px}
+.filters{gap:18px;margin-top:28px}
+.period-control button{font-size:17px;padding:10px 16px}
+.selects{gap:12px;flex-wrap:wrap}
+.selects label,.sort-label,.panel-title label,.table-controls label{font-size:16px;color:#62775a}
+select{font-size:16px;max-width:240px;padding:9px 26px 9px 12px;color:#36552e}
+.reset{font-size:15px;color:#667b5c}
+.notice{font-size:15px;line-height:1.9;padding:12px 15px;color:#75663e;align-items:flex-start}
+.notice-icon{font-size:14px;width:18px;height:18px;line-height:16px;margin-top:4px}
+.kpis{gap:18px}
+.kpi{padding:23px;min-height:198px}
+.kpi-top{font-size:17px;color:#5e7455;gap:9px}
+.kpi-icon{width:32px;height:32px;font-size:21px;flex-shrink:0}
+.kpi-value{font-size:48px;line-height:1.35;margin-top:14px}
+.kpi-value small{font-size:18px}
+.kpi-foot{font-size:14px;line-height:1.85;color:#657a5a}
+.kpi:first-child .kpi-foot{color:#c1d3bb}
+.kpi:first-child .kpi-top{color:#e1eadd}
+.panel{padding:28px}
+h2{font-size:24px;line-height:1.6}
+.section-kicker,.panel-title .section-kicker,.compare-strip .section-kicker{font-size:12px;line-height:1.8;color:#6d835d}
+.panel-sub{font-size:15px;line-height:1.85;color:#677c5b;margin:12px 0 19px}
+.legend{font-size:15px;color:#5b7451;gap:14px}
+.legend i{width:10px;height:10px}
+.trend{height:260px;padding-top:25px;padding-bottom:0}
+.month-total{font-size:17px;color:#4f6e43;padding-bottom:9px}
+.month-name{font-size:16px;color:#59754d;top:calc(100% + 12px)}
+.chart-foot{font-size:14px;line-height:1.8;color:#657c58;margin-top:43px}
+.pill{font-size:14px;color:#637d52;padding:6px 10px}
+.donut-wrap{padding:25px 0}
+.donut{width:200px;height:200px}
+.donut>div{width:157px;height:157px}
+.donut small{font-size:15px;color:#667d5a}
+.donut strong{font-size:40px;line-height:1.3}
+.donut span{font-size:14px;color:#6c815f}
+.source-stat{font-size:17px;color:#57734b;padding:13px 0}
+.source-stat small{font-size:15px;color:#687e5b}
+.source-stat i{width:10px;height:10px}
+.text-btn{font-size:15px;color:#5a7b45}
+.dept-bars{gap:18px}
+.dept-label{font-size:17px;width:86px;color:#4c6b41}
+.dept-value{font-size:17px;width:45px;color:#3d6033}
+.dept-track{height:13px}
+.leader{padding:14px 0;gap:14px}
+.rank-badge{font-size:17px;width:25px;color:#6c805e}
+.avatar{font-size:17px;width:42px;height:42px;flex-shrink:0;color:#627e51}
+.person-link{font-size:18px;line-height:1.65}
+.leader-name small{font-size:14px;color:#697e5c}
+.leader-score{font-size:26px}
+.leader-score small{font-size:14px;color:#697e5c}
+.compare-strip{padding:27px 30px;gap:30px}
+.compare-strip h2{font-size:24px}
+.compare-strip p:not(.section-kicker){font-size:15px;color:#617b52;line-height:1.8}
+.quarter-comparison{gap:35px}
+.quarter-item{min-width:180px}
+.quarter-item small{font-size:15px;color:#5a7849}
+.quarter-item strong{font-size:35px;line-height:1.5}
+.quarter-item strong span{font-size:16px}
+.quarter-item p{font-size:14px!important;line-height:1.8;max-width:240px}
+table{font-size:18px}
+th{font-size:16px;color:#556f49;line-height:1.8;padding:15px}
+td{padding:17px 15px;color:#4f6b44;line-height:1.8}
+.table-note{font-size:14px;line-height:1.95;color:#617952;margin-top:15px}
+.table-controls{gap:18px}
+.search{min-width:250px;max-width:380px}
+.search input{font-size:17px;padding:12px 0}
+.search span{font-size:27px}
+.check-label input{width:18px;height:18px}
+.pagination{font-size:15px;color:#617b51;line-height:1.8}
+.pagination button{font-size:17px;padding:7px 13px}
+.mini-track{height:11px}
+.source-details{font-size:15px;line-height:1.95;color:#607850}
+.source-details summary{font-size:16px;padding:20px 1px}
+.source-details summary span{font-size:21px}
+footer{font-size:13px;line-height:1.8;color:#68805a;gap:20px}
+footer b{color:#456a34}
+dialog{max-width:1040px;padding:32px}
+.dialog-head h2{font-size:32px}
+.dialog-head p:not(.section-kicker){font-size:17px;color:#617950}
+.zero{color:#7e9170}
+@media(max-width:1300px){
+ .chart-grid,.lower-grid{grid-template-columns:1fr;gap:22px}
+ .source-panel{display:grid;grid-template-columns:1fr 1fr;align-items:center;column-gap:28px}
+ .source-panel .panel-title{grid-column:1/-1}
+ .source-panel .donut-wrap{padding:22px 0 0}
+ .compare-strip{align-items:flex-start;flex-direction:column}
+ .quarter-comparison{width:100%;justify-content:space-between}
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .page-heading{align-items:flex-start}
+ .page-heading h1{font-size:31px}
+ .content{padding:30px 28px 22px}
+}
+@media(max-width:1000px){
+ .sidebar{width:238px;padding:27px 18px}
+ main{margin-left:238px}
+ .brand{font-size:23px;letter-spacing:.8px}
+ .brand small{font-size:11px}
+ .workspace-label{font-size:18px}
+ nav button{font-size:17px;padding:14px 11px}
+ .side-note h3{font-size:18px}
+ .side-note p{font-size:13px}
+ .page-heading h1{font-size:28px}
+ .page-heading p:not(.eyebrow){font-size:16px}
+ .period-control{width:100%}
+ .period-control button{flex:1;padding:10px 12px;font-size:16px}
+ .selects{width:100%;gap:14px}
+ .kpi{padding:20px;min-height:192px}
+ .kpi-value{font-size:44px}
+ .panel-title{flex-wrap:wrap}
+ .legend{font-size:14px}
+ .content{padding:28px 22px 20px}
+ .panel{padding:24px}
+}
+@media(max-width:700px){
+ body{font-size:16px}
+ .sidebar{width:100%;padding:14px 17px 0;overflow:visible}
+ main{margin-left:0}
+ .brand{font-size:23px;gap:11px}
+ .brand small{font-size:11px}
+ .workspace-label{display:block;font-size:15px;line-height:1.6;margin:12px 0 2px;letter-spacing:.2px}
+ .workspace-label span{display:inline}
+ nav{gap:3px;margin-top:8px}
+ nav button{font-size:15px;padding:11px 5px;line-height:1.6}
+ nav button span{display:none}
+ .topbar{height:55px;padding:0 18px;font-size:13px}
+ .snapshot-tag{font-size:12px}
+ .content{padding:26px 17px 20px}
+ .page-heading h1{font-size:28px;max-width:none;line-height:1.6}
+ .page-heading p:not(.eyebrow){font-size:16px}
+ .eyebrow{font-size:10px;letter-spacing:1px}
+ .export{width:41px;min-width:41px;padding:8px;font-size:22px;margin-top:21px}
+ .period-control button{font-size:15px;padding:10px 7px}
+ .selects{justify-content:flex-start;gap:12px}
+ .selects label{font-size:15px}
+ select{font-size:15px;max-width:155px;padding:9px 22px 9px 9px}
+ .selects select{max-width:130px}
+ .reset{font-size:14px;padding:7px 0}
+ .notice{font-size:14px;padding:11px 12px;gap:8px}
+ .kpis{gap:12px;margin-bottom:18px}
+ .kpi{padding:17px 15px;min-height:192px}
+ .kpi-top{font-size:15px;line-height:1.7;align-items:flex-start}
+ .kpi-icon{width:25px;height:25px;font-size:18px}
+ .kpi-value{font-size:37px;letter-spacing:-.7px;margin-top:13px;white-space:nowrap}
+ .kpi-value small{font-size:16px;margin-left:4px}
+ .kpi-foot{font-size:13px;line-height:1.85}
+ .panel{padding:23px 19px}
+ h2{font-size:22px}
+ .panel-title{gap:10px;flex-wrap:wrap;align-items:flex-start}
+ .panel-title label,.sort-label{font-size:14px}
+ .panel-title select{font-size:15px;max-width:170px}
+ .section-kicker,.panel-title .section-kicker,.compare-strip .section-kicker{font-size:10px;letter-spacing:1.2px}
+ .panel-sub{font-size:14px;line-height:1.85}
+ .legend{font-size:14px;gap:12px}
+ .trend{height:247px;gap:8px}
+ .month-total{font-size:15px}
+ .month-name{font-size:14px}
+ .chart-foot{font-size:13px}
+ .source-panel{display:block}
+ .source-panel .donut-wrap{padding:24px 0}
+ .donut{width:190px;height:190px}
+ .donut>div{width:149px;height:149px}
+ .donut strong{font-size:38px}
+ .donut small,.donut span{font-size:14px}
+ .source-stat{font-size:17px}
+ .source-stat small{font-size:14px}
+ .pill{font-size:13px}
+ .text-btn{font-size:14px}
+ .dept-label{font-size:16px;width:80px}
+ .dept-value{font-size:17px;width:42px}
+ .person-link{font-size:18px}
+ .leader-name small{font-size:14px}
+ .leader-score{font-size:25px}
+ .compare-strip{padding:25px 21px;gap:22px}
+ .compare-strip h2{font-size:23px}
+ .compare-strip p:not(.section-kicker){font-size:15px}
+ .quarter-comparison{gap:22px}
+ .quarter-item{min-width:0;flex:1}
+ .quarter-item small{font-size:14px}
+ .quarter-item strong{font-size:30px}
+ .quarter-item strong span{font-size:15px;margin-left:5px}
+ .quarter-item p{font-size:13px!important}
+ table{font-size:17px}
+ th{font-size:15px;padding:13px 12px}
+ td{padding:16px 12px}
+ .table-note{font-size:14px}
+ .table-controls label{font-size:15px}
+ .search{min-width:0;max-width:none}
+ .search input{font-size:17px}
+ .pagination{font-size:14px;gap:10px}
+ .pagination div{gap:10px}
+ .source-details{font-size:14px}
+ .source-details summary{font-size:15px}
+ footer{font-size:12px;flex-wrap:wrap;gap:7px}
+ dialog{padding:24px 20px}
+ dialog table{font-size:16px}
+ .dialog-head h2{font-size:28px}
+ .dialog-head p:not(.section-kicker){font-size:16px}
+}
+@media(max-width:380px){
+ .kpis{grid-template-columns:1fr}
+ .kpi{min-height:174px}
+ .kpi-value{font-size:44px}
+ .quarter-comparison{flex-direction:column}
+ .selects label{display:flex;align-items:center;gap:3px}
+ nav button{font-size:14px}
+}
+@media print{
+ main{margin:0}
+ body{font-size:14px}
+ .page-heading h1{font-size:27px}
+ .kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+ .kpi{min-height:160px;padding:14px}
+ .kpi-top{font-size:13px}
+ .kpi-value{font-size:32px}
+ .kpi-foot{font-size:11px}
+ table{font-size:13px}
+ th{font-size:12px}
+ th,td{padding:10px 8px}
+ .table-note{font-size:12px}
+}
