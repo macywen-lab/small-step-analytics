@@ -38,8 +38,6 @@ select{font-size:16px;max-width:240px;padding:9px 26px 9px 12px;color:#36552e}
 .kpi-value{font-size:48px;line-height:1.35;margin-top:14px}
 .kpi-value small{font-size:18px}
 .kpi-foot{font-size:14px;line-height:1.85;color:#657a5a}
-.kpi:first-child .kpi-foot{color:#c1d3bb}
-.kpi:first-child .kpi-top{color:#e1eadd}
 .panel{padding:28px}
 h2{font-size:24px;line-height:1.6}
 .section-kicker,.panel-title .section-kicker,.compare-strip .section-kicker{font-size:12px;line-height:1.8;color:#6d835d}
