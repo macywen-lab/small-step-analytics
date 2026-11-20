@@ -1,7 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-const target = new URL(process.env.PUBLIC_APP_URL || 'https://small-step-analytics-2026.workspace-926599.chatgpt.site/');
+const template = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const defaultUrl = template.match(/<link rel="canonical" href="([^"]+)">/)[1];
+const target = new URL(process.env.PUBLIC_APP_URL || defaultUrl);
 if (target.protocol !== 'https:' || target.username || target.password || target.href !== target.origin + '/' || target.hostname.endsWith('.github.io')) {
   throw new Error('PUBLIC_APP_URL must be the HTTPS root URL of the live Worker or Cloudflare Pages site.');
 }
@@ -37,15 +39,6 @@ if (!validation.invalidFields?.some(field => field.field === 'sender')) {
 
 const output = new URL('../dist/github-pages/', import.meta.url);
 const link = target.href.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-const html = `<!doctype html>
-<html lang="zh-Hant">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="0; url=${link}">
-<link rel="canonical" href="${link}">
-<title>多一小步</title>
-<a href="${link}">開啟「多一小步」</a>
-</html>
-`;
+const html = template.replaceAll(defaultUrl, () => link);
 await mkdir(new URL('login/', output), { recursive: true });
 await Promise.all(['index.html', 'login.html', 'login/index.html'].map(path => writeFile(new URL(path, output), html)));

@@ -40,3 +40,16 @@ jobs:
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Check public Pages URL
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error --max-time 10 "${PAGE_URL}?check=${GITHUB_RUN_ID}-${attempt}" > page.html &&
+               grep -Fq '<meta http-equiv="refresh" content="0; url=https://' page.html; then
+              echo "The public Pages URL serves the direct entry."
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
