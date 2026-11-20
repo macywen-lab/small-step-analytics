@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build.mjs",
+    "build:cloudflare-pages": "npm run build && node scripts/build-cloudflare-pages.mjs",
+    "build:github-pages": "node scripts/build-github-pages.mjs",
     "test": "node --test tests/*.test.mjs"
   }
 }
