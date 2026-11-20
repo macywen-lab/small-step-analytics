@@ -5,7 +5,7 @@
  const banner=document.getElementById('pwaStatus');
  function showStatus(message,action,label){if(!banner)return;banner.replaceChildren();const text=document.createElement('span');text.textContent=message;banner.append(text);if(action){const b=document.createElement('button');b.textContent=label;b.onclick=action;banner.append(b)}const close=document.createElement('button');close.textContent='×';close.className='pwa-dismiss';close.setAttribute('aria-label','關閉提示');close.onclick=()=>banner.hidden=true;banner.append(close);banner.hidden=false}
  function syncInstall(){if(button)button.hidden=standalone()}
- function connection(){if(!navigator.onLine)showStatus('目前離線。畫面保留本次載入的資料；請連線後重新整理。');else if(registration?.waiting)offerUpdate();else if(banner)banner.hidden=true}
+ function connection(){if(!navigator.onLine)showStatus(document.body.classList.contains('employee-login-body')?'目前離線，請連線後登入並查看資料。':'目前離線。畫面保留本次載入的資料；請連線後重新整理。');else if(registration?.waiting)offerUpdate();else if(banner)banner.hidden=true}
  function offerUpdate(){showStatus('新版本已準備好，更新即可使用最新功能。',()=>{requestedUpdate=true;registration.waiting?.postMessage({type:'ACTIVATE_UPDATE'})},'更新 App')}
  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;syncInstall()});
  window.addEventListener('appinstalled',()=>{installPrompt=null;syncInstall();dialog?.close();showStatus('已安裝多一小步，可從主畫面開啟。')});

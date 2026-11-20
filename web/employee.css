@@ -1,12 +1,12 @@
-[hidden]{display:none!important}.employee-login-body{margin:0;min-height:100svh;background:#f5f4eb;color:#234c3b;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;display:grid;place-items:center;padding:24px;box-sizing:border-box}.employee-login-layout{width:min(980px,100%);display:grid;grid-template-columns:1.1fr 1fr;background:white;border:1px solid #e1e5d8;border-radius:22px;overflow:hidden;box-shadow:0 24px 70px #224e3610}.login-story{padding:56px 44px;background:#fff8df;position:relative;overflow:hidden}.login-mark{display:grid;place-items:center;width:52px;height:52px;border:1px solid #b9c9aa;border-radius:50%;font-size:32px;color:#748b57;margin-bottom:38px}.login-story h1{font-family:"Noto Serif TC","PMingLiU",serif;font-weight:600;font-size:40px;line-height:1.6;margin:0 0 22px;letter-spacing:3px}.login-story p{font-size:17px;line-height:1.9;color:#718267}.login-story .login-promise{border-top:1px solid #ded8bb;padding-top:24px;margin-top:35px;font-size:15px;letter-spacing:1px}.login-panel{padding:56px 40px}.login-panel h2{font-size:26px;margin:0 0 12px}.login-panel>p{font-size:16px;line-height:1.8;color:#788572}.employee-form{display:grid;gap:20px;margin-top:28px}.employee-form label,.note-composer label{display:grid;gap:9px;font-size:16px;font-weight:500;color:#355541}.employee-form input,.note-composer input,.note-composer select,.note-composer textarea{box-sizing:border-box;width:100%;border:1px solid #cdd9c5;border-radius:8px;background:white;padding:13px 14px;font:inherit;color:#234d3d;min-height:48px}.employee-form input:focus,.note-composer :is(input,select,textarea):focus{outline:2px solid #aabf91;outline-offset:2px}.employee-form input[readonly],.note-composer input[readonly]{background:#f3f6ef;color:#65765b}.employee-button{border:0;border-radius:8px;background:#234f3d;color:white;font:inherit;font-size:17px;padding:13px 22px;min-height:48px;cursor:pointer;text-decoration:none;text-align:center}.employee-button:disabled{opacity:.5;cursor:wait}.employee-button.secondary{background:white;color:#345741;border:1px solid #cbd8c0}.employee-message{padding:12px 15px;background:#eef5e8;border:1px solid #cfdfc3;border-radius:7px;font-size:15px;line-height:1.8;color:#345b40;white-space:pre-line}.employee-message.error{background:#fff0e8;border-color:#e5ba9f;color:#8a432a}.login-footer{font-size:14px;line-height:1.8;color:#86917d;margin-top:22px}.login-footer a{color:#567047}.note-composer{margin:0 0 26px;border:1px solid #e2d39a;border-radius:14px;background:#fff9e6;padding:28px 32px}.note-composer h2{font-size:28px;line-height:1.5;color:#27523b;margin:5px 0 10px}.note-composer .composer-intro{font-size:17px;line-height:1.9;color:#748264;margin:0 0 16px}.note-composer details{font-size:16px;line-height:1.9;color:#627654;margin:10px 0}.note-composer summary{cursor:pointer;padding:8px 0}.note-composer details p{margin:10px 0}.note-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:24px}.note-composer .full{grid-column:1/-1}.note-composer textarea{resize:vertical;min-height:140px;line-height:1.8}.note-composer .same-person{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:400;margin-top:8px}.note-composer .same-person input{width:18px;height:18px;min-height:0;accent-color:#315b40}.note-composer label small{font-size:13px;color:#829273;font-weight:400}.note-composer .composer-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px}.note-composer .composer-actions p{font-size:14px;color:#76866a;line-height:1.8;margin:0}.settings-panel{max-width:700px}.settings-profile{display:grid;grid-template-columns:120px 1fr;font-size:17px;gap:15px;margin:24px 0;padding:20px 0;border-top:1px solid #e0e6d9;border-bottom:1px solid #e0e6d9}.settings-profile dt{color:#839377}.settings-profile dd{margin:0;overflow-wrap:anywhere}.settings-actions{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap}.settings-panel .employee-form{max-width:480px}.settings-panel h3{font-size:21px}.settings-panel p{font-size:16px;line-height:1.9;color:#7b896f}body.settings-view .filters,body.settings-view .notice,body.settings-view #kpis,body.settings-view .source-details{display:none!important}
-@media(max-width:700px){.employee-login-body{padding:16px}.employee-login-layout{grid-template-columns:1fr;border-radius:16px}.login-story{padding:24px 26px}.login-mark{width:35px;height:35px;font-size:24px;margin-bottom:15px}.login-story h1{font-size:28px;letter-spacing:2px;margin-bottom:10px}.login-story p{font-size:14px;margin:4px 0}.login-story .login-promise{margin-top:16px;padding-top:13px;font-size:13px}.login-panel{padding:26px}.login-panel h2{font-size:24px}.employee-form{gap:18px;margin-top:22px}.note-composer{padding:20px 16px;margin-bottom:20px}.note-composer h2{font-size:23px}.note-composer .composer-intro{font-size:15px}.note-form-grid{grid-template-columns:1fr;gap:19px}.note-composer .composer-actions{align-items:stretch;flex-direction:column;gap:12px}.settings-profile{grid-template-columns:85px 1fr;font-size:16px}.settings-panel{padding:22px 18px}.settings-actions>*{flex:1}.employee-form input,.note-composer :is(input,select,textarea){font-size:16px}}
+[hidden]{display:none!important}.employee-login-body{margin:0;min-height:100svh;background:#f5f4eb;color:#234c3b;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;display:grid;place-items:center;padding:24px;box-sizing:border-box}.employee-login-layout{width:min(980px,100%);display:grid;grid-template-columns:1.1fr 1fr;background:white;border:1px solid #e1e5d8;border-radius:22px;overflow:hidden;box-shadow:0 24px 70px #224e3610}.login-story{padding:56px 44px;background:#fff8df;position:relative;overflow:hidden}.login-mark{display:grid;place-items:center;width:52px;height:52px;border:1px solid #b9c9aa;border-radius:50%;font-size:32px;color:#748b57;margin-bottom:38px}.login-story h1{font-family:"Noto Serif TC","PMingLiU",serif;font-weight:600;font-size:40px;line-height:1.6;margin:0 0 22px;letter-spacing:3px}.login-story p{font-size:17px;line-height:1.9;color:#718267}.login-story .login-promise{border-top:1px solid #ded8bb;padding-top:24px;margin-top:35px;font-size:15px;letter-spacing:1px}.login-panel{padding:56px 40px}.login-panel h2{font-size:26px;margin:0 0 12px}.login-panel>p{font-size:16px;line-height:1.8;color:#788572}.employee-form{display:grid;gap:20px;margin-top:28px}.employee-form label,.note-composer label{display:grid;gap:9px;font-size:16px;font-weight:500;color:#355541}.employee-form input,.note-composer input,.note-composer select,.note-composer textarea{box-sizing:border-box;width:100%;border:1px solid #cdd9c5;border-radius:8px;background:white;padding:13px 14px;font:inherit;color:#234d3d;min-height:48px}.employee-form input:focus,.note-composer :is(input,select,textarea):focus{outline:2px solid #aabf91;outline-offset:2px}.employee-form input[readonly],.note-composer input[readonly]{background:#f3f6ef;color:#65765b}.employee-button{border:0;border-radius:8px;background:#234f3d;color:white;font:inherit;font-size:17px;padding:13px 22px;min-height:48px;cursor:pointer;text-decoration:none;text-align:center}.employee-button:disabled{opacity:.5;cursor:wait}.employee-button.secondary{background:white;color:#345741;border:1px solid #cbd8c0}.employee-message{padding:12px 15px;background:#eef5e8;border:1px solid #cfdfc3;border-radius:7px;font-size:15px;line-height:1.8;color:#345b40;white-space:pre-line}.employee-message.error{background:#fff0e8;border-color:#e5ba9f;color:#8a432a}.login-footer{font-size:14px;line-height:1.8;color:#86917d;margin-top:22px}.login-footer a{color:#567047}.note-composer{margin:0 0 26px;border:1px solid #e2d39a;border-radius:14px;background:#fff9e6;padding:28px 32px}.note-composer h2{font-size:28px;line-height:1.5;color:#27523b;margin:5px 0 10px}.note-composer .composer-intro{font-size:17px;line-height:1.9;color:#748264;margin:0 0 16px}.note-composer details{font-size:16px;line-height:1.9;color:#627654;margin:10px 0}.note-composer summary{cursor:pointer;padding:8px 0}.note-composer details p{margin:10px 0}.note-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:24px}.note-composer .full{grid-column:1/-1}.note-composer textarea{resize:vertical;min-height:140px;line-height:1.8}.note-composer .same-person{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:400;margin-top:8px}.note-composer .same-person input{width:18px;height:18px;min-height:0;accent-color:#315b40}.note-composer label small{font-size:13px;color:#829273;font-weight:400}.note-composer .composer-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px}.note-composer .composer-actions p{font-size:14px;color:#76866a;line-height:1.8;margin:0}
+@media(max-width:700px){.employee-login-body{padding:16px}.employee-login-layout{grid-template-columns:1fr;border-radius:16px}.login-story{padding:24px 26px}.login-mark{width:35px;height:35px;font-size:24px;margin-bottom:15px}.login-story h1{font-size:28px;letter-spacing:2px;margin-bottom:10px}.login-story p{font-size:14px;margin:4px 0}.login-story .login-promise{margin-top:16px;padding-top:13px;font-size:13px}.login-panel{padding:26px}.login-panel h2{font-size:24px}.employee-form{gap:18px;margin-top:22px}.note-composer{padding:20px 16px;margin-bottom:20px}.note-composer h2{font-size:23px}.note-composer .composer-intro{font-size:15px}.note-form-grid{grid-template-columns:1fr;gap:19px}.note-composer .composer-actions{align-items:stretch;flex-direction:column;gap:12px}.employee-form input,.note-composer :is(input,select,textarea){font-size:16px}}
 
 /* A dedicated writing surface, with the same free-text controls for both names. */
 body.write-view .content>.filters,body.write-view .notice,body.write-view #kpis,body.write-view .source-details,body.write-view .page-heading,body.write-view main footer{display:none!important}
 #write{max-width:940px;margin:0 auto}#write .note-composer{margin:0}#write .note-composer label{position:relative}#write .field-vi{font-size:12px;font-weight:400;color:#7b896c}#write label>.field-vi{display:inline;font-size:12px;margin-top:-5px}#write .sender-field .field-vi{margin:0}#write .note-composer .sender-field{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:6px 12px}#write .sender-field input{grid-column:2;grid-row:1;max-width:360px}#write .sender-hint{grid-column:2}
 @media(max-width:900px){
- .mobile-app-nav{grid-template-columns:repeat(6,minmax(0,1fr))}.mobile-app-nav>button{font-size:10.5px;white-space:nowrap}
- body.write-view .topbar{display:none}body.write-view .content{padding:10px 12px 12px}body.write-view{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+ .mobile-app-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.mobile-app-nav>button{font-size:10.5px;white-space:nowrap}
+ body.write-view .topbar{display:flex}body.write-view .content{padding:10px 12px 12px}body.write-view{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
  #write .note-composer{box-sizing:border-box;padding:16px 16px 14px;border-radius:12px}
  #write .note-composer>.section-kicker{font-size:9px;letter-spacing:1px;line-height:1.4;margin:0 0 5px}
  #write .note-composer h2{font-size:clamp(19px,5.3vw,22px);line-height:1.5;letter-spacing:0;margin:0 0 6px}
@@ -30,8 +30,13 @@ body.write-view .content>.filters,body.write-view .notice,body.write-view #kpis,
 }
 
 .section-tabs{display:flex;gap:6px;background:#ecf0e6;padding:5px;border:1px solid #dce4d3;border-radius:10px;width:fit-content;margin:0 0 24px;max-width:100%;box-sizing:border-box}.section-tabs button{border:0;background:transparent;padding:12px 20px;min-height:46px;font:inherit;color:#70826a;border-radius:7px;cursor:pointer}.section-tabs button[aria-selected=true]{background:white;color:#244f3d;font-weight:600;box-shadow:0 2px 7px #234f3d0b}.my-notes-card{margin-bottom:24px;background:#fff9e6;border-color:#eadcae}.note-status{border-radius:5px;padding:4px 9px;font-size:13px;background:#edf1e7;color:#5b7050}.note-status.pending{background:#f7ecc7;color:#8a6c28}.note-status.rejected{background:#f8e7df;color:#9a5136}.notes-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}.notes-toolbar input,.notes-toolbar select{max-width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cbd7c0;border-radius:7px;font:inherit;background:white;color:#31533c}.notes-toolbar input{flex:1;min-width:160px}
-@media(max-width:700px){.section-tabs{width:100%;margin-bottom:18px}.section-tabs button{flex:1;padding:10px 8px;font-size:15px;white-space:nowrap}.my-notes-card{padding:22px 16px}.my-notes-card h2{font-size:23px}.mobile-app-nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:700px){.section-tabs{width:100%;margin-bottom:18px}.section-tabs button{flex:1;padding:10px 8px;font-size:15px;white-space:nowrap}.my-notes-card{padding:22px 16px}.my-notes-card h2{font-size:23px}.mobile-app-nav{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 
+/* Installation is available before sign-in without growing a separate card. */
+.login-footer-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;flex-wrap:wrap}
+.login-footer-actions .pwa-install{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:5px 10px;font:inherit;font-size:13px;white-space:nowrap}
+.login-footer-actions .pwa-install img{border-radius:6px;flex-shrink:0}
+.employee-login-body .pwa-banner{bottom:calc(12px + env(safe-area-inset-bottom))}
 /* Keep the complete mobile sign-in form within a typical phone viewport. */
 @media(max-width:700px){
  .employee-login-body{padding:12px;min-height:100svh;align-content:center}
@@ -83,4 +88,126 @@ body.write-view .content>.filters,body.write-view .notice,body.write-view #kpis,
  #write .sender-hint .field-vi{font-size:10px}
  #write .note-form-grid{gap:12px}#write .same-person{min-height:36px}
  #write .note-composer .employee-button{min-height:55px}
+}
+/* Friendly heading companions, with space reserved for the complete title. */
+.content>.page-heading{display:grid;grid-template-columns:minmax(0,1fr) 176px;gap:18px;align-items:center}
+.content>.page-heading>div{min-width:0}
+.page-mascot{display:block;width:160px;height:176px;object-fit:contain;justify-self:end;pointer-events:none;user-select:none}
+@media(max-width:900px){
+ .content>.page-heading{grid-template-columns:minmax(0,1fr) clamp(96px,32vw,136px);gap:8px;align-items:center}
+ .content>.page-heading .eyebrow{font-size:clamp(8px,2.1vw,10px);letter-spacing:.5px;white-space:nowrap}
+ .content>.page-heading #pageTitle{font-size:clamp(20px,6vw,26px);line-height:1.65;letter-spacing:0}
+ .page-mascot{width:100%;height:clamp(112px,37vw,154px)}
+ body.write-view .topbar{display:flex;min-height:44px;height:auto;padding:8px 16px;box-sizing:border-box}
+ body.write-view .topbar .top-actions{display:none}
+}
+@media print{.page-mascot{display:none}}
+
+/* A separate welcoming expression sits beside the login heading. */
+.login-welcome{display:grid;grid-template-columns:minmax(0,1fr) 136px;gap:10px;align-items:center}
+.login-welcome-copy{min-width:0}
+.login-welcome-copy p{font-size:16px;line-height:1.8;color:#788572;margin:0}
+.login-mascot{display:block;width:136px;height:136px;object-fit:contain;pointer-events:none;user-select:none}
+@media(max-width:700px){
+ .login-welcome{grid-template-columns:minmax(0,1fr) clamp(96px,30vw,128px);gap:8px}
+ .employee-login-body .login-welcome-copy p{font-size:13px;line-height:1.55;margin:0}
+ .login-mascot{width:100%;height:clamp(98px,30vw,128px)}
+}
+@media(max-width:360px){.employee-login-body .login-welcome-copy p{font-size:12px}}
+
+/* Emphasise the two-line campaign name on the employee sign-in page. */
+.employee-login-body .login-story h1{font-size:44px;font-weight:800}
+@media(max-width:700px){
+ .employee-login-body .login-story h1{font-size:clamp(26px,7.2vw,30px);font-weight:800;line-height:1.3}
+}
+@media(max-width:700px) and (max-height:620px){
+ .employee-login-body .login-story h1{font-size:25px}
+}
+
+/* Keep all three name controls beside their bilingual captions. */
+#write .name-field-group{grid-column:1/-1;min-width:0}
+#write .note-composer .name-field{grid-column:1/-1;display:grid;grid-template-columns:130px minmax(0,1fr);align-items:center;gap:6px 12px;min-width:0}
+#write .name-field .field-caption{grid-column:1;grid-row:1;min-width:0}
+#write .name-field input{grid-column:2;grid-row:1;max-width:360px;min-width:0;width:100%}
+#write .name-field>small{grid-column:2;margin:0}
+#write .name-field-group .same-person{margin-left:142px}
+@media(max-width:900px){
+ #write .note-composer .name-field{grid-template-columns:105px minmax(0,1fr);gap:6px 12px}
+ #write .name-field-group .same-person{margin-left:117px}
+ #write .name-field .field-caption .field-vi{overflow-wrap:anywhere}
+ #write .note-composer .sender-hint{grid-column:2}
+ .mobile-app-nav{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+/* Full examples stay inside the existing, initially collapsed writing guide. */
+#write .writing-example{margin-top:14px;line-height:1.8;overflow-wrap:anywhere}
+#write .writing-example p{margin:0 0 5px}
+#write .writing-example ol{margin:0;padding-left:1.6em}
+#write .writing-example li{padding:2px 0}
+#write .writing-example[lang="vi"]{color:#728168}
+
+/* Field-specific validation keeps the unfinished note available for correction. */
+#write .name-field input[aria-invalid="true"]{border-color:#b64436;outline:2px solid #b6443620}
+#write .name-field .name-validation-error{grid-column:2;color:#a53228;font-size:14px;line-height:1.6}
+#noteNameDialog{width:min(560px,calc(100% - 28px));max-height:85dvh;overflow:auto;border:1px solid #d4dec9;border-radius:14px;padding:24px;color:#254e3c;background:#fffdf5;font:16px/1.8 var(--font)}
+#noteNameDialog::backdrop{background:#15382b88}
+#noteNameDialog h2{margin:0 0 12px;font-size:24px}
+#noteNameDialog p{margin:6px 0}
+#noteNameDialog section{padding:12px 0;border-top:1px solid #dfe5d5}
+#noteNameDialog .name-suggestion{font:inherit;min-height:44px;padding:7px 14px;margin:5px 8px 5px 0;border:1px solid #bccfb3;border-radius:7px;background:#edf4e7;color:#24513b}
+#noteNameDialog .name-suggestion[aria-pressed="true"]{background:#24513b;color:white}
+#noteNameDialog .name-suggestion-status{font-size:14px;color:#56724d}
+
+/* A: warm handwritten stationery, with decorative hearts outside the controls. */
+#write .note-composer{position:relative;isolation:isolate;overflow:hidden;border:1px solid #d4b56c;border-radius:18px;background-color:#fff8e2;background-image:radial-gradient(ellipse at 15% 8%,#ffffffb8,transparent 60%),repeating-linear-gradient(4deg,#cbbd8d07 0 1px,transparent 1px 4px),repeating-linear-gradient(94deg,#cbbd8d05 0 1px,transparent 1px 5px);padding:30px 36px 22px;box-shadow:0 8px 28px #785c1c0b;color:#294831}
+#write .note-stationery-brand{display:flex;align-items:center;gap:9px;margin:0 58px 18px 0;font-size:20px;line-height:1.5;font-weight:700;letter-spacing:1px;color:#294e35}
+#write .note-stationery-brand img{width:40px;height:auto;flex-shrink:0}
+#write .note-composer>.section-kicker{display:none}
+#write .note-composer h2{font-family:"Noto Serif TC","PMingLiU",serif;font-size:30px;line-height:1.65;font-weight:700;color:#294e35;padding-right:36px;margin:0 0 12px;text-wrap:balance}
+#write .note-composer h2 .field-vi{font-family:var(--font);font-size:15px;font-weight:400;line-height:1.65;color:#657450;text-wrap:pretty}
+#write .note-composer .composer-intro{color:#687555;font-size:16px}
+#write .note-composer>details{margin:12px 0}
+#write .note-composer>details>summary{padding:4px 0;color:#3f5a36;font-weight:600}
+#write .note-composer>details>summary .field-vi{color:#687555}
+#write .note-composer>details>p,#write .note-composer>details>.writing-example{margin:10px 0}
+#write .note-composer .field-caption{color:#355536;font-weight:600}
+#write .note-composer :is(input:not([type=checkbox]),textarea){border-color:#c9cbb6;background:#fffefcf2;box-shadow:inset 0 1px 3px #62532604}
+#write .note-composer input[readonly]{background:#f2f4e9}
+#write .note-composer :is(input,textarea):focus{outline-color:#a6b78b}
+#write .note-composer input[aria-invalid="true"]{border-color:#b64436}
+#write .note-composer .employee-button{background:#46663f;border:1px solid #46663f;border-radius:10px;box-shadow:0 3px 8px #34553512}
+#write .note-composer .composer-actions{border-top:1px solid #e8dab5;padding-top:18px}
+#write .note-heart-signoff{display:block;width:100%;height:40px;margin:18px 0 0;color:#d89374;pointer-events:none}
+@media(max-width:900px){
+ #write .note-composer{padding:22px 18px 16px;border-radius:16px}
+  #write .note-stationery-brand{font-size:18px;margin:0 42px 12px 0;gap:7px}
+ #write .note-stationery-brand img{width:clamp(29px,8vw,39px);height:auto}
+  #write .note-composer h2{font-size:clamp(22px,6vw,28px);line-height:1.6;padding-right:26px;margin-bottom:10px}
+ #write .note-composer h2 .field-vi{font-size:12px;line-height:1.6}
+ #write .note-composer .composer-intro{font-size:13px;line-height:1.8;margin-bottom:12px}
+ #write .note-composer>details{margin:6px 0 12px}
+ #write .note-composer .composer-actions{padding-top:14px;margin-top:16px;gap:12px}
+ #write .note-composer .employee-button{font-size:16px}
+ #write .note-heart-signoff{height:28px;margin-top:14px}
+}
+
+#write .note-composer .note-title-line{display:block}
+
+/* The original A artwork includes its own paper grain, crease and ink. */
+#write .note-paper-fold{position:absolute;top:0;right:0;width:min(27%,148px);height:auto;mask-image:linear-gradient(to right,transparent,#000 11%),linear-gradient(to top,transparent,#000 12%);mask-composite:intersect;pointer-events:none;z-index:1}
+#write .note-stationery-brand{margin-right:125px}
+#write .note-composer h2{text-align:center;padding-right:0;margin-top:14px}
+#write .note-title-flourish{display:block;width:min(250px,80%);height:24px;margin:-2px auto 6px;color:#d78c6e;pointer-events:none}
+@media(max-width:900px){
+ #write .note-stationery-brand{margin-right:94px;margin-bottom:18px}
+ #write .note-composer h2{padding-right:0;margin-top:12px}
+ #write .note-title-flourish{width:205px;height:22px;margin:0 auto 6px}
+}
+
+@keyframes rose-flourish-sweep{
+ from{transform:translateX(0)}
+ 80%,to{transform:translateX(346px)}
+}
+@media screen and (prefers-reduced-motion:no-preference){
+ #write .flourish-glint{animation:rose-flourish-sweep 4s linear infinite}
 }

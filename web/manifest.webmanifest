@@ -1,11 +1,32 @@
 {
- "id":"/", "name":"多一小步｜看見你的好", "short_name":"多一小步",
- "description":"每一步，都值得被看見。查閱團隊肯定、部門分析與暖心便條紙。",
- "lang":"zh-Hant-TW", "start_url":"/", "scope":"/", "display":"standalone",
- "background_color":"#f7f8f2", "theme_color":"#174b3f",
- "icons":[
-  {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-  {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
-  {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
- ]
+  "id": "/",
+  "name": "多一小步｜看見你的好",
+  "short_name": "多一小步",
+  "description": "每一步，都值得被看見。查閱團隊肯定、部門分析與暖心便利貼。",
+  "lang": "zh-Hant-TW",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f2",
+  "theme_color": "#174b3f",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png?v=42",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png?v=42",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png?v=42",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
