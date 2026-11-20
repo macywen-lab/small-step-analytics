@@ -16,8 +16,8 @@ async function requireEmployee(request,bucket){const token=(request.headers.get(
 async function employeeAuthApi(request,bucket,path){
  const action=path.slice('/api/employee/auth/'.length);if(request.method!=='GET')writeGuard(request);
  if(action==='login'&&request.method==='POST'){
-  const input=await employeeBody(request),id=String(input.id||'').trim(),ip=request.headers.get('cf-connecting-ip')||'local',attemptKey=EMP_ROOT+'attempts/'+await authDigest(ip+'/'+id),attemptObj=await bucket.get(attemptKey),attempt=attemptObj?await attemptObj.json():{count:0,until:0};if(attempt.until>Date.now()&&attempt.count>=10)fail('登入錯誤次數較多，請於 15 分鐘後再試。',429);
-  const {users}=await employeeUsers(bucket),user=users.find(u=>u.id===id),hash=await authPassword(String(input.password||''),user?.salt||'employee-unknown-salt'),current=await readCurrent(bucket),person=current.record.snapshot.roster?.find(e=>e.name===user?.name);
+  const input=await employeeBody(request),id=String(input.id||'').trim(),{users}=await employeeUsers(bucket),user=users.find(u=>u.id===id),ip=request.headers.get('cf-connecting-ip')||'local',attemptKey=EMP_ROOT+'attempts/'+await authDigest(ip+'/'+id+'/'+(user?.revision||'unknown')),attemptObj=await bucket.get(attemptKey),attempt=attemptObj?await attemptObj.json():{count:0,until:0};if(attempt.until>Date.now()&&attempt.count>=10)fail('登入錯誤次數較多，請於 15 分鐘後再試。',429);
+  const hash=await authPassword(String(input.password||''),user?.salt||'employee-unknown-salt'),current=await readCurrent(bucket),person=current.record.snapshot.roster?.find(e=>e.name===user?.name);
   if(!user||!user.hash||!authEqual(hash,user.hash)||employeeLoginState(user,person)!=='已啟用'||!String(input.password||'').trim()){await bucket.put(attemptKey,JSON.stringify({count:attempt.until>Date.now()?attempt.count+1:1,until:attempt.until>Date.now()?attempt.until:Date.now()+900000}));fail('工號或密碼不正確，或帳號尚未啟用；請洽人資確認。',401)}
   await bucket.delete(attemptKey);const token=authHex(crypto.getRandomValues(new Uint8Array(32)));await bucket.put(EMP_ROOT+'sessions/'+await authDigest(token),JSON.stringify({id:user.id,revision:user.revision,expires:Date.now()+28800000}));return json(employeeProfile(user,person),200,{'set-cookie':employeeCookie(token,request)})
  }
@@ -28,16 +28,51 @@ async function employeeAuthApi(request,bucket,path){
  return json({error:'找不到這個操作。'},404)
 }
 async function employeeAccountsApi(request,bucket){const {user}=await requireAdminSession(request,bucket);if(user.role!=='admin')fail('僅管理員可匯入員工登入帳號。',403);const current=await readCurrent(bucket),roster=current.record.snapshot.roster||[];
- if(request.method==='GET'){const {users}=await employeeUsers(bucket);return json({users:users.map(u=>({id:u.id,name:u.name,createdAt:u.createdAt,updatedAt:u.updatedAt,state:employeeLoginState(u,roster.find(e=>e.name===u.name))}))})}
+ if(request.method==='GET'){const {users}=await employeeUsers(bucket);return json({users:users.map(u=>({id:u.id,name:u.name,revision:u.revision,createdAt:u.createdAt,updatedAt:u.updatedAt,state:employeeLoginState(u,roster.find(e=>e.name===u.name))}))})}
  if(request.method!=='POST')fail('不支援這個操作。',405);writeGuard(request);const input=await employeeBody(request,1024*1024);
  // Validate before entering the conditional directory update; revalidate on any contention.
  await prepareEmployeeAccounts(input,roster,(await employeeUsers(bucket)).users,true);
  const result=await employeeMutation(bucket,async users=>{const prepared=await prepareEmployeeAccounts(input,roster,users);users.splice(0,users.length,...prepared.users);return prepared.summary});return json(result,201)
 }
+async function employeeResetPassword(request,bucket){
+ const {user:actor}=await requireAdminSession(request,bucket);
+ if(actor.role!=='admin')fail('僅管理員可重設員工密碼。',403);
+ if(request.method!=='POST')fail('請使用重設密碼表單。',405);
+ writeGuard(request);const input=await employeeBody(request);
+ const id=String(input.id||'').trim();
+ if(!/^[A-Za-z0-9._-]{1,30}$/.test(id)||typeof input.name!=='string'||typeof input.expectedRevision!=='string')fail('請重新選取員工後再重設。',422);
+ if(typeof input.newPassword!=='string'||input.newPassword.length<8||input.newPassword.length>128||!input.newPassword.trim())fail('新密碼請填 8～128 個字元，不能只填空白。',422);
+ const salt=authHex(crypto.getRandomValues(new Uint8Array(16))),hash=await authPassword(input.newPassword,salt);
+ const result=await employeeMutation(bucket,async users=>{
+  const target=users.find(u=>u.id===id&&u.name===input.name);if(!target)fail('找不到這位員工帳號。',404);
+  if(target.revision!==input.expectedRevision)fail('此員工帳號剛被更新，請重新整理後再重設。',409);
+  const current=await readCurrent(bucket),person=current.record.snapshot.roster?.find(e=>e.name===target.name);
+  if(employeeLoginState(target,person)!=='已啟用')fail('此帳號已停用、離職或尚未啟用，不能透過重設密碼恢復登入；請先核對員工名單。',422);
+  const now=new Date().toISOString();Object.assign(target,{salt,hash,revision:crypto.randomUUID(),updatedAt:now,passwordResetAt:now,passwordResetBy:actor.id});
+  return {id:target.id,name:target.name,reset:true};
+ });return json(result);
+}
 async function webNotes(bucket){const obj=await bucket.get(WEB_NOTES);return {obj,notes:obj?(await obj.json()).notes:[]}}
-async function submitEmployeeNote(request,bucket){writeGuard(request);const session=await requireEmployee(request,bucket),input=await employeeBody(request,30000),id=String(input.id||'');if(!/^[a-f0-9-]{36}$/.test(id))fail('提交識別碼不正確，請重新開啟表單。',422);const helper=String(input.helper||'').trim(),beneficiary=textValue(input.beneficiary,'被幫忙的人',150),content=textValue(input.content||'','事件說明／Mô tả sự việc',20000),current=await readCurrent(bucket),person=current.record.snapshot.roster.find(e=>e.name===helper);if(!person||employmentStatus(person)!=='在職')fail('請填寫目前在職同仁的完整姓名。',422);
+function noteNameKey(value){return String(value||'').normalize('NFKC').replace(/\s+/gu,'').toLocaleLowerCase()}
+function noteNameDistance(a,b){a=[...a];b=[...b];let row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const next=[i];for(let j=1;j<=b.length;j++)next[j]=Math.min(next[j-1]+1,row[j]+1,row[j-1]+(a[i-1]===b[j-1]?0:1));row=next}return row[b.length]}
+function noteNameErrors(values,roster){
+ const names=[...new Set(roster.filter(e=>employmentStatus(e)==='在職').map(e=>e.name))];
+ return [['sender','填表人'],['helper','幫忙的人'],['beneficiary','被幫忙的人']].flatMap(([field,label])=>{
+  const value=values[field];if(names.includes(value))return [];
+  const key=noteNameKey(value),limit=Math.max(1,Math.floor([...key].length/3));
+  const suggestions=key&&key.length<=150?names.map(name=>({name,distance:noteNameDistance(key,noteNameKey(name))})).filter(e=>e.distance<=limit).sort((a,b)=>a.distance-b.distance||a.name.localeCompare(b.name,'zh-Hant')).slice(0,3).map(e=>e.name):[];
+  return [{field,label,value,suggestions}];
+ });
+}
+async function submitEmployeeNote(request,bucket,publicSubmission=false){
+ writeGuard(request);const session=publicSubmission?null:await requireEmployee(request,bucket),input=await employeeBody(request,30000),id=String(input.id||'');
+ if(!/^[a-f0-9-]{36}$/.test(id))fail('提交識別碼不正確，請重新開啟表單。',422);
+ const helper=typeof input.helper==='string'?input.helper.trim():'',beneficiary=typeof input.beneficiary==='string'?input.beneficiary.trim():'',sender=publicSubmission?(typeof input.sender==='string'?input.sender.trim():''):session.person.name,current=await readCurrent(bucket);
+ const invalidFields=noteNameErrors({sender,helper,beneficiary},current.record.snapshot.roster||[]);
+ if(invalidFields.length)return json({error:invalidFields.map(e=>'「'+e.label+'」姓名不正確，請填寫目前在職同仁的完整姓名。').join('\n'),invalidFields},422);
+ const content=textValue(input.content||'','事件說明／Mô tả sự việc',20000),person=current.record.snapshot.roster.find(e=>e.name===helper),submitterId=publicSubmission?'public:'+sender:session.user.id;
  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),part=t=>parts.find(p=>p.type===t).value,year=Number(part('year')),month=Number(part('month'));if(year!==2026)fail('目前統計年度為 2026，請洽人資開啟新年度後再填寫。',422);
- const note={id,employeeId:session.user.id,year,month,quarter:'q'+Math.ceil(month/3),date:`${year}/${part('month')}/${part('day')}`,createdAt:new Date().toISOString(),name:person.name,department:person.department,sender:session.person.name,beneficiary,content};
- for(let i=0;i<5;i++){const currentNotes=await webNotes(bucket),same=currentNotes.notes.find(n=>n.id===id);if(same){if(same.employeeId!==session.user.id)fail('提交識別碼重複，請重新填寫。',409);if(same.name!==helper||same.beneficiary!==beneficiary||same.content!==content)fail('同一提交識別碼的內容不同，請重新填寫。',409);return json({saved:true,duplicate:true,id,date:same.date})}if(currentNotes.notes.length>=50000)fail('便條紙數量已達上限，請洽管理員。',422);const recent=currentNotes.notes.filter(n=>n.employeeId===session.user.id&&Date.parse(n.createdAt)>Date.now()-60000);if(recent.length>=10)fail('送出較頻繁，請稍後再試。',429);const serialized=JSON.stringify({notes:[...currentNotes.notes,note]});if(new TextEncoder().encode(serialized).length>8*1024*1024)fail('便條紙資料需由管理員整理後再送出。',422);const saved=await bucket.put(WEB_NOTES,serialized,{onlyIf:currentNotes.obj?{etagMatches:currentNotes.obj.etag}:{etagDoesNotMatch:'*'}});if(saved)return json({saved:true,id,date:note.date},201)}fail('其他同仁剛送出便條紙，請再按一次送出。',409)
+ const note={id,employeeId:submitterId,year,month,quarter:'q'+Math.ceil(month/3),date:`${year}/${part('month')}/${part('day')}`,createdAt:new Date().toISOString(),name:person.name,department:person.department,sender,beneficiary,content};
+ for(let i=0;i<5;i++){const currentNotes=await webNotes(bucket),same=currentNotes.notes.find(n=>n.id===id);if(same){if(same.employeeId!==submitterId)fail('提交識別碼重複，請重新填寫。',409);if(same.name!==helper||same.beneficiary!==beneficiary||same.content!==content)fail('同一提交識別碼的內容不同，請重新填寫。',409);return json({saved:true,duplicate:true,id,date:same.date})}if(currentNotes.notes.length>=50000)fail('便利貼數量已達上限，請洽管理員。',422);const recent=currentNotes.notes.filter(n=>n.employeeId===submitterId&&Date.parse(n.createdAt)>Date.now()-60000);if(recent.length>=10)fail('送出較頻繁，請稍後再試。',429);const serialized=JSON.stringify({notes:[...currentNotes.notes,note]});if(new TextEncoder().encode(serialized).length>8*1024*1024)fail('便利貼資料需由管理員整理後再送出。',422);const saved=await bucket.put(WEB_NOTES,serialized,{onlyIf:currentNotes.obj?{etagMatches:currentNotes.obj.etag}:{etagDoesNotMatch:'*'}});if(saved)return json({saved:true,id,date:note.date},201)}fail('其他同仁剛送出便利貼，請再按一次送出。',409)
 }
 async function effectiveSnapshot(bucket,snapshot){return reviewedSnapshot(bucket,snapshot)}
