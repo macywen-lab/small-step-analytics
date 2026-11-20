@@ -1,7 +1,20 @@
 /* A shared, quiet reading space within the data overview. */
 .overview-highlights{margin:0 0 28px;min-width:0}
 #kpis{display:grid}
-#stories .highlight-theater{background:linear-gradient(110deg,#fffbee 0%,#fff8df 68%,#fff5d7 100%);border:1px solid #e2d39a;border-radius:10px;padding:20px 27px 0;box-shadow:none;color:#284b36}
+@property --warm-gold-angle{syntax:"<angle>";inherits:false;initial-value:30deg}
+@keyframes warm-gold-shine{from{--warm-gold-angle:30deg}to{--warm-gold-angle:390deg}}
+#stories .highlight-theater,
+#quarterCharts .qc-panel.qc-current{
+ background:linear-gradient(110deg,#fffefa,#fffbee) padding-box,
+  repeating-conic-gradient(from var(--warm-gold-angle,30deg),#a47927 0deg,#e3bb61 42deg,#fff6c8 68deg,#fffef3 74deg,#e9c56b 86deg,#ad822e 140deg,#a47927 180deg) border-box;
+ border:3px solid transparent;
+ box-shadow:0 0 8px #d9ae4e40
+}
+#stories .highlight-theater{border-radius:10px;padding:20px 27px 0;color:#284b36}
+@media screen and (prefers-reduced-motion:no-preference){
+ #stories .highlight-theater:not(:fullscreen):not(.is-presenting),
+ #quarterCharts .qc-panel.qc-current{animation:warm-gold-shine 8s linear infinite}
+}
 #stories .stage-atmosphere{opacity:.42}
 #stories .stage-orbits{opacity:.14}
 #stories #warmthWebGL,#stories #warmthCanvas{opacity:.26}
@@ -58,7 +71,7 @@
 #stories .highlight-empty>span{font-size:31px;color:#afad80}
 #stories .highlight-empty h3{font-size:24px;color:#6b8557;margin:6px 0}
 #stories .highlight-empty p{font-size:17px;line-height:1.9;margin:10px 0}
-#stories .highlight-theater:is(:fullscreen,.is-presenting){padding:30px 45px 0;border:0;border-radius:0;background:linear-gradient(115deg,#fffbee,#fff8df);display:flex;flex-direction:column;overflow:auto;width:100%;height:100%}
+#stories .highlight-theater:is(:fullscreen,.is-presenting){padding:30px 45px 0;border:0;border-radius:0;background:linear-gradient(115deg,#fffefa,#fffbee);display:flex;flex-direction:column;overflow:auto;width:100%;height:100%}
 #stories .highlight-theater:is(:fullscreen,.is-presenting) .highlight-masthead{padding-bottom:0;flex-shrink:0}
 #stories .highlight-theater:is(:fullscreen,.is-presenting) .highlight-masthead h2{font-size:38px}
 #stories .highlight-theater:is(:fullscreen,.is-presenting) .highlight-masthead h2 span{font-size:21px}
@@ -87,3 +100,29 @@
 .content > .overview-highlights{margin:0 0 24px}.content > .overview-highlights[hidden]{display:none!important}.campaign-year{min-height:25px}.campaign-year i{margin-left:auto}
 
 #yearQuarterControl{flex-wrap:wrap;gap:3px}#yearQuarterControl button{white-space:nowrap}.filters>.selects{flex-wrap:wrap}
+
+/* Keep the writing surface the same size across all four paper shapes. */
+:is(#stories #highlightCard,#electronicReader #enList){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:none;gap:0;align-content:start}
+#stories #highlightCard[hidden]{display:none}
+:is(#highlightCard,#enList) .season-note{position:relative;aspect-ratio:1.45;min-width:0;background-size:100% 100%;background-repeat:no-repeat}
+.season-note.q1{--writing-inset:28% 10% 18% 10%;background-image:url(/quarter-notes/q1.png)}
+.season-note.q2{--writing-inset:20% 9% 8% 18%;background-image:url(/quarter-notes/q2.png)}
+.season-note.q3{--writing-inset:28% 10% 18% 10%;background-image:url(/quarter-notes/q3.png)}
+.season-note.q4{--writing-inset:21% 10% 17% 10%;background-image:url(/quarter-notes/q4.png)}
+:is(#highlightCard,#enList) .season-copy{position:absolute;inset:var(--writing-inset);overflow-y:auto;overflow-x:hidden;font:16px/1.45 var(--font);overflow-wrap:anywhere;color:#244737;text-align:left}
+:is(#highlightCard,#enList) .season-copy small{font-size:max(11px,.83em);color:#405646}
+:is(#highlightCard,#enList) .season-copy blockquote{margin:.45em 0;white-space:pre-wrap;font:inherit;color:inherit}
+:is(#highlightCard,#enList) .season-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0 .35em}
+:is(#highlightCard,#enList) .season-heading>div{min-width:0}
+:is(#highlightCard,#enList) .season-heading time{margin-left:auto;flex:none}
+:is(#highlightCard,#enList) :is(.season-credit,.season-beneficiary) strong{font-weight:700}
+:is(#highlightCard,#enList) .season-heading time,:is(#highlightCard,#enList) :is(.season-credit,.season-beneficiary){font-size:max(10px,.69em);color:#405646}
+:is(#highlightCard,#enList) .season-credit{text-align:right}
+@media(max-width:600px){
+ :is(#stories #highlightCard,#electronicReader #enList){margin-inline:-10px}
+ :is(#highlightCard,#enList) .season-note{aspect-ratio:auto;height:clamp(212px,60vw,300px)}
+ :is(#highlightCard,#enList) .season-copy{font-size:14px}
+}
+
+#electronicReader #enList{background:transparent;border:0}
+#enList .en-empty{grid-column:1/-1}
