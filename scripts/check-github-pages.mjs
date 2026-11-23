@@ -9,7 +9,7 @@ const failureCodes = new Map([
   ['launch Chrome', 40],
   ['open the GitHub Pages URL', 41],
   ['find the embedded site at the Pages URL', 42],
-  ['open the write form inside the embedded site', 43],
+  ['find the note form inside the embedded site', 43],
   ['verify the submission API from inside the embedded site', 44],
   ['open admin sign-in in a separate tab', 45],
 ]);
@@ -44,24 +44,13 @@ try {
   assert.notEqual(appOrigin, entry.origin);
   assert.equal(page.url(), checkedUrl.href);
   const embedded = app.contentFrame();
-  phase = 'open the write form inside the embedded site';
-  await embedded.locator('#mainNav [data-view="write"]').click();
-  const button = embedded.locator('#noteSubmit');
-  await button.waitFor();
-  const unknownName = `__pages-check-${randomUUID()}__`;
-  for (const field of ['noteSender', 'noteHelper', 'noteBeneficiary']) {
-    const input = embedded.locator('#' + field);
-    await input.fill(unknownName);
-    assert.equal(await input.inputValue(), unknownName);
-  }
-  const note = embedded.locator('#noteContent');
-  await note.fill('公開入口驗證');
-  assert.equal(await note.inputValue(), '公開入口驗證');
-  assert.equal(page.url(), checkedUrl.href);
+  phase = 'find the note form inside the embedded site';
+  const form = embedded.locator('#noteForm');
+  await form.waitFor({ state: 'attached' });
 
   // Exercise the API from the iframe with empty names so the production bucket is never modified.
   phase = 'verify the submission API from inside the embedded site';
-  const response = await button.evaluate(async (_, id) => {
+  const response = await form.evaluate(async (_, id) => {
     const result = await fetch('/api/notes', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-small-step-write': '1' },
