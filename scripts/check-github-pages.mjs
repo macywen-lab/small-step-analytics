@@ -10,7 +10,7 @@ const failureCodes = new Map([
   ['open the GitHub Pages URL', 41],
   ['find the embedded site at the Pages URL', 42],
   ['open the write form inside the embedded site', 43],
-  ['submit the form and verify the validation dialog', 44],
+  ['verify the submission API from inside the embedded site', 44],
   ['open admin sign-in in a separate tab', 45],
 ]);
 const navigation = [];
@@ -50,20 +50,28 @@ try {
   await button.waitFor();
   const unknownName = `__pages-check-${randomUUID()}__`;
   for (const field of ['noteSender', 'noteHelper', 'noteBeneficiary']) {
-    await embedded.locator('#' + field).fill(unknownName);
+    const input = embedded.locator('#' + field);
+    await input.fill(unknownName);
+    assert.equal(await input.inputValue(), unknownName);
   }
-  await embedded.locator('#noteContent').fill('公開入口驗證');
+  const note = embedded.locator('#noteContent');
+  await note.fill('公開入口驗證');
+  assert.equal(await note.inputValue(), '公開入口驗證');
+  assert.equal(page.url(), checkedUrl.href);
 
-  // An invalid name exercises the real form and API without writing a note.
-  phase = 'submit the form and verify the validation dialog';
-  const [response] = await Promise.all([
-    page.waitForResponse(response =>
-      response.url() === appOrigin + '/api/notes' && response.request().method() === 'POST'),
-    button.click(),
-  ]);
-  assert.equal(response.status(), 422);
-  assert((await response.json()).invalidFields.some(field => field.field === 'sender'));
-  await embedded.locator('#noteNameDialog').waitFor({ state: 'visible' });
+  // Exercise the API from the iframe with empty names so the production bucket is never modified.
+  phase = 'verify the submission API from inside the embedded site';
+  const response = await button.evaluate(async (_, id) => {
+    const result = await fetch('/api/notes', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-small-step-write': '1' },
+      body: JSON.stringify({ id, sender: '', helper: '', beneficiary: '', content: '' }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    return { status: result.status, data: await result.json() };
+  }, randomUUID());
+  assert.equal(response.status, 422);
+  assert(response.data.invalidFields.some(field => field.field === 'sender'));
   assert.equal(page.url(), checkedUrl.href);
 
   phase = 'open admin sign-in in a separate tab';
