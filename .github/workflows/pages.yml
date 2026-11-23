@@ -58,9 +58,13 @@ jobs:
             sleep 5
           done
           exit 1
+      - name: Install browser test driver
+        run: npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
       - name: Check the form and address in Chrome
+        id: browser
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
-          PLAYWRIGHT_PACKAGE_JSON="$RUNNER_TEMP/pages-browser/node_modules/playwright/package.json" node scripts/check-github-pages.mjs
+        run: PLAYWRIGHT_PACKAGE_JSON="$RUNNER_TEMP/pages-browser/node_modules/playwright/package.json" node scripts/check-github-pages.mjs
+      - name: ${{ steps.browser.outputs.diagnosis }}
+        if: ${{ failure() && steps.browser.outputs.diagnosis != '' }}
+        run: exit 1

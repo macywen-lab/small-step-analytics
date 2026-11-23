@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { appendFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 
 const { chromium } = createRequire(process.env.PLAYWRIGHT_PACKAGE_JSON)('playwright');
@@ -68,9 +69,13 @@ try {
   assert.equal(page.url(), checkedUrl.href);
   console.log('The form kept the GitHub Pages address, and admin sign-in opened in its own tab.');
 } catch (error) {
-  if (process.env.GITHUB_ACTIONS === 'true') {
-    console.error(`::error title=Pages browser check::Could not ${phase}. ${navigation.join(' | ')}`);
+  const details = `Could not ${phase}. ${error.name}. ${navigation.join(' | ')}`;
+  const reports = [];
+  if (process.env.GITHUB_OUTPUT) reports.push(appendFile(process.env.GITHUB_OUTPUT, `diagnosis=${details}\n`));
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    reports.push(appendFile(process.env.GITHUB_STEP_SUMMARY, `### Pages browser check\n\n${details}\n`));
   }
+  await Promise.all(reports);
   throw error;
 } finally {
   await browser.close();
