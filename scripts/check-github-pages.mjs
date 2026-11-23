@@ -17,9 +17,7 @@ const navigation = [];
 try {
   const { chromium } = createRequire(process.env.PLAYWRIGHT_PACKAGE_JSON)('playwright');
   const entry = new URL(process.env.PAGE_URL);
-  browser = await chromium.launch(process.env.CHROMIUM_PATH
-    ? { executablePath: process.env.CHROMIUM_PATH }
-    : { channel: 'chrome' });
+  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
   phase = 'open the GitHub Pages URL';
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   page.setDefaultTimeout(15_000);

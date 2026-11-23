@@ -59,7 +59,9 @@ jobs:
           done
           exit 1
       - name: Install browser test driver
-        run: npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
+          "$RUNNER_TEMP/pages-browser/node_modules/.bin/playwright" install chromium --only-shell
       - name: Check the form and address in Chrome
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
