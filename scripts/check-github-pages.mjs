@@ -70,12 +70,10 @@ try {
   console.log('The form kept the GitHub Pages address, and admin sign-in opened in its own tab.');
 } catch (error) {
   const details = `Could not ${phase}. ${error.name}. ${navigation.join(' | ')}`;
-  const reports = [];
-  if (process.env.GITHUB_OUTPUT) reports.push(appendFile(process.env.GITHUB_OUTPUT, `diagnosis=${details}\n`));
+  console.error(details);
   if (process.env.GITHUB_STEP_SUMMARY) {
-    reports.push(appendFile(process.env.GITHUB_STEP_SUMMARY, `### Pages browser check\n\n${details}\n`));
+    await appendFile(process.env.GITHUB_STEP_SUMMARY, `### Pages browser check\n\n${details}\n`);
   }
-  await Promise.all(reports);
   throw error;
 } finally {
   await browser?.close();
