@@ -56,10 +56,11 @@ try {
 
   // An invalid name exercises the real form and API without writing a note.
   phase = 'submit the form and verify the validation dialog';
-  const responsePromise = page.waitForResponse(response =>
-    response.url() === appOrigin + '/api/notes' && response.request().method() === 'POST');
-  await button.click();
-  const response = await responsePromise;
+  const [response] = await Promise.all([
+    page.waitForResponse(response =>
+      response.url() === appOrigin + '/api/notes' && response.request().method() === 'POST'),
+    button.click(),
+  ]);
   assert.equal(response.status(), 422);
   assert((await response.json()).invalidFields.some(field => field.field === 'sender'));
   await embedded.locator('#noteNameDialog').waitFor({ state: 'visible' });
@@ -67,9 +68,7 @@ try {
 
   phase = 'open admin sign-in in a separate tab';
   const adminLink = page.locator('footer a');
-  const popupPromise = page.waitForEvent('popup');
-  await adminLink.click();
-  const adminPage = await popupPromise;
+  const [adminPage] = await Promise.all([page.context().waitForEvent('page'), adminLink.click()]);
   await adminPage.locator('#adminLoginForm').waitFor({ state: 'attached' });
   assert.equal(adminPage.url(), appOrigin + '/admin.html');
   assert.equal(page.url(), checkedUrl.href);
