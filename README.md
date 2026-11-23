@@ -18,6 +18,6 @@
 
 ### GitHub Pages 分享網址
 
-GitHub Pages 從 `main` 根目錄發布時，會使用 `index.html` 直接開啟上方的正式網站。若要使用發布前的自動檢查及舊登入網址轉址，在 GitHub 儲存庫的 **Settings → Pages** 將發布來源設為 **GitHub Actions**。若公開應用程式使用其他網址，在儲存庫的 **Settings → Secrets and variables → Actions → Variables** 將 `PUBLIC_APP_URL` 設為該站的 HTTPS 根網址，再執行 **Publish GitHub Pages entry**。
+GitHub Pages 從 `main` 根目錄發布時，會使用 `index.html` 嵌入上方的正式網站，訪客瀏覽和填寫時網址列會保留 GitHub Pages 網址。管理員可從頁尾的「後台管理登入（另開分頁）」在獨立分頁登入。
 
-發布流程會以未登入訪客的身分確認首頁、資料 API 與填寫驗證。檢查通過後，GitHub Pages 分享網址會直接轉到公開應用程式，舊的 `login` 和 `login.html` 入口也會轉到同一個首頁。便利貼由公開應用程式的 API 保存。
+若要使用自動驗證及支援舊的 `login` 和 `login.html` 網址，在 GitHub 儲存庫的 **Settings → Pages** 將發布來源設為 **GitHub Actions**。若公開應用程式使用其他網址，請讓該網站允許 GitHub Pages 嵌入，並在 **Settings → Secrets and variables → Actions → Variables** 將 `PUBLIC_APP_URL` 設為該站的 HTTPS 根網址，再執行 **Publish GitHub Pages site**。發布流程會以未登入訪客身分在 Chrome 驗證填寫表單與 GitHub Pages 網址。

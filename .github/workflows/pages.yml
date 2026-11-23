@@ -1,4 +1,4 @@
-name: Publish GitHub Pages entry
+name: Publish GitHub Pages site
 
 on:
   push:
@@ -31,12 +31,17 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
@@ -46,10 +51,16 @@ jobs:
         run: |
           for attempt in {1..12}; do
             if curl --fail --silent --show-error --max-time 10 "${PAGE_URL}?check=${GITHUB_RUN_ID}-${attempt}" > page.html &&
-               grep -Fq '<meta http-equiv="refresh" content="0; url=https://' page.html; then
-              echo "The public Pages URL serves the direct entry."
+               grep -Fq '<iframe data-public-app' page.html; then
+              echo "The public Pages URL serves the app."
               exit 0
             fi
             sleep 5
           done
           exit 1
+      - name: Check the form and address in Chrome
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
+          PLAYWRIGHT_PACKAGE_JSON="$RUNNER_TEMP/pages-browser/node_modules/playwright/package.json" node scripts/check-github-pages.mjs

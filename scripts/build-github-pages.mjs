@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const template = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const defaultUrl = template.match(/<link rel="canonical" href="([^"]+)">/)[1];
+const defaultUrl = template.match(/<iframe data-public-app src="([^"]+)"/)[1];
 const target = new URL(process.env.PUBLIC_APP_URL || defaultUrl);
 if (target.protocol !== 'https:' || target.username || target.password || target.href !== target.origin + '/' || target.hostname.endsWith('.github.io')) {
   throw new Error('PUBLIC_APP_URL must be the HTTPS root URL of the live Worker or Cloudflare Pages site.');
@@ -21,6 +21,17 @@ async function request(path, status, options) {
 const home = await request('/', 200);
 if (!home.headers.get('content-type')?.startsWith('text/html') || !(await home.text()).includes('id="noteForm"')) {
   throw new Error('The public homepage did not return the convenience-note form.');
+}
+const pagesOrigin = 'https://macywen-lab.github.io';
+const frameAncestors = home.headers.get('content-security-policy')?.match(/frame-ancestors[^;,]*/gi) ?? [];
+if (frameAncestors.length) {
+  for (const directive of frameAncestors) {
+    if (!directive.trim().split(/\s+/).slice(1).some(source => ['*', 'https:', pagesOrigin].includes(source))) {
+      throw new Error('The app frame-ancestors policy does not permit the GitHub Pages origin.');
+    }
+  }
+} else if (home.headers.has('x-frame-options')) {
+  throw new Error('The app X-Frame-Options policy does not permit the GitHub Pages origin.');
 }
 const dataset = await (await request('/api/dataset', 200)).json();
 if (dataset.schemaVersion !== 1 || !Array.isArray(dataset.data) || !Array.isArray(dataset.roster)) {
