@@ -5,6 +5,14 @@ import { createRequire } from 'node:module';
 
 let browser;
 let phase = 'launch Chrome';
+const failureCodes = new Map([
+  ['launch Chrome', 40],
+  ['open the GitHub Pages URL', 41],
+  ['find the embedded site at the Pages URL', 42],
+  ['open the write form inside the embedded site', 43],
+  ['submit the form and verify the validation dialog', 44],
+  ['open admin sign-in in a separate tab', 45],
+]);
 const navigation = [];
 try {
   const { chromium } = createRequire(process.env.PLAYWRIGHT_PACKAGE_JSON)('playwright');
@@ -70,11 +78,11 @@ try {
   console.log('The form kept the GitHub Pages address, and admin sign-in opened in its own tab.');
 } catch (error) {
   const details = `Could not ${phase}. ${error.name}. ${navigation.join(' | ')}`;
-  console.error(details);
+  console.error(details, error);
+  process.exitCode = failureCodes.get(phase);
   if (process.env.GITHUB_STEP_SUMMARY) {
     await appendFile(process.env.GITHUB_STEP_SUMMARY, `### Pages browser check\n\n${details}\n`);
   }
-  throw error;
 } finally {
   await browser?.close();
 }
