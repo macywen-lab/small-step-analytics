@@ -3,16 +3,16 @@ import { randomUUID } from 'node:crypto';
 import { appendFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 
-const { chromium } = createRequire(process.env.PLAYWRIGHT_PACKAGE_JSON)('playwright');
-const entry = new URL(process.env.PAGE_URL);
-const browser = await chromium.launch({
-  channel: 'chrome',
-  ...(process.env.CHROMIUM_PATH && { channel: undefined, executablePath: process.env.CHROMIUM_PATH }),
-});
-
-let phase = 'open the GitHub Pages URL';
+let browser;
+let phase = 'launch Chrome';
 const navigation = [];
 try {
+  const { chromium } = createRequire(process.env.PLAYWRIGHT_PACKAGE_JSON)('playwright');
+  const entry = new URL(process.env.PAGE_URL);
+  browser = await chromium.launch(process.env.CHROMIUM_PATH
+    ? { executablePath: process.env.CHROMIUM_PATH }
+    : { channel: 'chrome' });
+  phase = 'open the GitHub Pages URL';
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   page.setDefaultTimeout(15_000);
   page.on('response', response => {
@@ -78,5 +78,5 @@ try {
   await Promise.all(reports);
   throw error;
 } finally {
-  await browser.close();
+  await browser?.close();
 }
