@@ -15,8 +15,8 @@ test('public browsing performs no storage mutations and hides backend identities
  for(const path of ['/api/admin/status','/api/admin/backup','/api/admin/web-notes','/upload-template.xlsx'])assert.equal((await call(b,path)).status,401);
 });
 test('public submissions validate sender, resist duplicate counting, and publish only after backend review',async()=>{
- const b=new LocalBucket,snapshot={};for(const [key,file]of[['data','data.json'],['stories','stories.json'],['notes','electronic-notes.json'],['roster','roster.json']])snapshot[key]=JSON.parse(await readFile(new URL('../web/'+file,import.meta.url)));
- snapshot.roster=snapshot.roster.map(e=>({...e,status:'在職',hireDate:'2020-01-01',leaveDate:''}));const revision='12345678-1234-1234-1234-123456789abc';await b.put('small-step/v1/versions/'+revision+'.json',JSON.stringify({revision,snapshot,filename:'fixture.xlsx'}));await b.put('small-step/v1/current.json',JSON.stringify({revision}));
+ const b=new LocalBucket,snapshot={data:[],stories:[],notes:[],paperNotes:[],roster:[{name:'測試員工',department:'測試部門',employeeId:'90000001',status:'在職',hireDate:'2020-01-01',leaveDate:''}]};
+ const revision='12345678-1234-1234-1234-123456789abc';await b.put('small-step/v1/versions/'+revision+'.json',JSON.stringify({revision,snapshot,filename:'fixture.xlsx'}));await b.put('small-step/v1/current.json',JSON.stringify({revision}));
  const name=snapshot.roster[0].name,input={id:crypto.randomUUID(),sender:name,helper:name,beneficiary:name,content:'免登入測試，感謝協助。'};
  for(const sender of ['', '不存在'])assert.equal((await call(b,'/api/notes',{...input,sender})).status,422);
  assert.equal((await call(b,'/api/notes',input,{origin:'https://evil.example'})).status,403);

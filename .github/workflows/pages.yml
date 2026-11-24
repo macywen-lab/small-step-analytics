@@ -21,8 +21,6 @@ jobs:
           node-version: 24
       - run: npm run build && npm test
       - run: npm run build:github-pages
-        env:
-          PUBLIC_APP_URL: ${{ vars.PUBLIC_APP_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/github-pages
@@ -51,18 +49,14 @@ jobs:
         run: |
           for attempt in {1..12}; do
             if curl --fail --silent --show-error --max-time 10 "${PAGE_URL}?check=${GITHUB_RUN_ID}-${attempt}" > page.html &&
-               grep -Fq '<iframe data-public-app' page.html; then
-              echo "The public Pages URL serves the app."
+               grep -Fq '<main id="source-only">' page.html; then
+              echo "The public Pages URL serves the source-only page."
               exit 0
             fi
             sleep 5
           done
           exit 1
-      - name: Install browser test driver
-        run: |
-          npm install --prefix "$RUNNER_TEMP/pages-browser" --no-save --no-package-lock playwright@1.65.1
-          "$RUNNER_TEMP/pages-browser/node_modules/.bin/playwright" install chromium --only-shell
-      - name: Check the form and address in Chrome
+      - name: Check the published address and content
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: PLAYWRIGHT_PACKAGE_JSON="$RUNNER_TEMP/pages-browser/node_modules/playwright/package.json" node scripts/check-github-pages.mjs
+        run: node scripts/check-github-pages.mjs
